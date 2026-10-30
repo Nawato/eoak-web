@@ -1,2 +1,2 @@
 # eoak-web
-Website for End Of All known
+Website for End Of All Known
