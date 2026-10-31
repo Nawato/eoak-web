@@ -66,12 +66,13 @@ export function toHttpsUrl(value: string | undefined | null): string | null {
 }
 
 export interface LabeledLink {
+  _key?: string;
   label?: string;
   url?: string;
 }
 
-export function getHttpsLinks(links?: LabeledLink[] | null): { label: string; href: string }[] {
+export function getHttpsLinks(links?: LabeledLink[] | null): { key?: string; label: string; href: string }[] {
   return (links ?? [])
-    .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
-    .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
+    .map((link) => ({ key: link._key, label: link.label, href: toHttpsUrl(link.url) }))
+    .filter((link): link is { key: string | undefined; label: string; href: string } => !!link.label && !!link.href);
 }

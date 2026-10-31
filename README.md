@@ -66,6 +66,10 @@ Until a logo or photo is uploaded, the site shows the band name and a gradient b
 
 **Site Settings → Hero Logo** controls the large front-page logo; **Header Logo** controls the compact navigation logo independently. Both accept PNG, SVG or WebP. An unset header logo shows the band name as text, not the hero logo.
 
+Releases with a future **Release Date** appear first as "Coming soon" with a relative date (e.g. "in 12 days") and move into the regular list automatically on the release date. Give a release a **Slug** (and optional **Teaser Text**) to create its own page at `/releases/<slug>`.
+
+Listen links on releases are counted: they go through `/go/<release>/<link>`, which increments a read-only **Clicks** counter on the link in the Studio (bots are ignored). This needs `SANITY_API_WRITE_TOKEN` (an Editor token) in the web environment. If your revalidation webhook fires on every change, exclude the `clicks` field from its projection/filter to avoid a cache refresh per click.
+
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
 
 Tour dates require **Load Bandsintown content** consent. Set the exact band profile name in **Home Page → Tour Dates → Bandsintown Artist Name**. Past dates are hidden. The widget uses Bandsintown's JSONP event endpoint, so `rest.bandsintown.com` must be permitted by both `script-src` and `connect-src` in the website CSP. A direct Bandsintown search link remains available if an ad blocker or network error prevents loading.

@@ -106,7 +106,7 @@ const IMPRESSUM_QUERY = defineQuery(`*[_id == "impressum"][0]{
 }`);
 
 const RELEASES_QUERY = defineQuery(
-  `*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]{ _id, title, releaseType, releaseDate, cover, "links": coalesce(links, []) }`,
+  `*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]{ _id, title, "slug": slug.current, teaser, releaseType, releaseDate, cover, "links": coalesce(links, []) }`,
 );
 
 const MEMBERS_QUERY = defineQuery(
@@ -122,6 +122,8 @@ export const getImpressum = cache(() => fetchContent<Impressum | null>(IMPRESSUM
 export interface Release {
   _id: string;
   title: string;
+  slug?: string | null;
+  teaser?: string | null;
   releaseType?: string;
   releaseDate: string;
   cover?: unknown;
