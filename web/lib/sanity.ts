@@ -6,6 +6,7 @@ import type { LabeledLink } from '@/lib/embeds';
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
 const token = process.env.SANITY_API_READ_TOKEN || undefined;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 if (!projectId || !dataset) {
   throw new Error('Missing NEXT_PUBLIC_SANITY_PROJECT_ID or NEXT_PUBLIC_SANITY_DATASET. See web/.env.example.');
@@ -15,7 +16,7 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion: '2024-01-01',
-  useCdn: !token,
+  useCdn: !token && !isDevelopment,
   token,
 });
 
@@ -24,7 +25,13 @@ export const SANITY_CACHE_TAG = 'sanity';
 
 // Errors propagate on purpose: a failed fetch must not be cached as "no content".
 function fetchContent<T>(query: string): Promise<T> {
-  return sanityClient.fetch<T>(query, {}, { next: { revalidate: REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] } });
+  return sanityClient.fetch<T>(
+    query,
+    {},
+    isDevelopment
+      ? { cache: 'no-store' }
+      : { next: { revalidate: REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] } },
+  );
 }
 
 export interface SiteSettings {
@@ -37,6 +44,7 @@ export interface SiteSettings {
   streamingLinks?: LabeledLink[];
   merchUrl?: string;
   logo?: unknown;
+  headerLogo?: unknown;
   heroBackground?: unknown;
   heroBackgroundAlt?: string;
   heroOverlayOpacity?: number | null;

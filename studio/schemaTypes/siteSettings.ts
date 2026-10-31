@@ -13,11 +13,18 @@ export default defineType({
     },
     {
       name: 'logo',
-      title: 'Logo',
+      title: 'Hero Logo',
       type: 'image',
-      description: 'Band logo shown in the header and hero. PNG (transparent) or SVG recommended. Replaces the text name when set.',
+      description: 'Large front-page logo. PNG (transparent) or SVG recommended. Independent of the header logo.',
       options: { accept: 'image/png,image/svg+xml,image/webp' },
     },
+    defineField({
+      name: 'headerLogo',
+      title: 'Header Logo',
+      type: 'image',
+      description: 'Compact logo for the navigation bar. PNG (transparent) or SVG recommended. If unset, the header shows the band name as text.',
+      options: { accept: 'image/png,image/svg+xml,image/webp' },
+    }),
     {
       name: 'heroBackground',
       title: 'Hero Background Photo',

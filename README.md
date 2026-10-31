@@ -61,6 +61,8 @@ The Studio has three single documents plus two lists (**Releases** and **Band Me
 
 Until a logo or photo is uploaded, the site shows the band name and a gradient background.
 
+**Site Settings → Hero Logo** controls the large front-page logo; **Header Logo** controls the compact navigation logo independently. Both accept PNG, SVG or WebP. An unset header logo shows the band name as text, not the hero logo.
+
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
 
 Add photographers under **Site Settings → Photographer Credits** with their names, optional websites/social profiles and photo attributions (e.g. live photos, member portraits or hero photo). Reorder entries by dragging them in Sanity. They appear at the bottom of every page; **Credits Heading** controls the section title. The section stays hidden until credits are added. Upload live pictures through **Press Kit → Gallery**, and member portraits through **Band Members**.
@@ -77,7 +79,9 @@ npm run deploy-schema   # schema only
 
 ### Instant updates (webhook)
 
-Content is cached for 60 seconds. For instant updates, create a webhook in Sanity (manage.sanity.io → API → Webhooks):
+Publish your edits in Studio to make them visible on the website; uploading an image only saves a draft until you publish. Refresh the local website after publishing. Local development bypasses the content cache and Sanity CDN so published edits appear on refresh.
+
+In production, content is cached for 60 seconds. For faster updates, create a webhook in Sanity (manage.sanity.io → API → Webhooks):
 
 - URL: `https://<your-domain>/api/revalidate`
 - Method POST, with a secret equal to `SANITY_REVALIDATE_SECRET`

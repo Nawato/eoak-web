@@ -72,7 +72,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.logo} links={links} />
+        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.headerLogo} links={links} />
         <main id="main" className="min-h-screen">{children}</main>
         <Footer
           bandName={bandName}
