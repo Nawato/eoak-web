@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSyncExternalStore, type ReactNode } from 'react';
 import { readConsent, writeConsent, subscribeConsent } from '@/lib/consent';
+import { cn } from '@/lib/utils';
 
 interface ConsentEmbedProps {
   provider: string;
@@ -20,14 +21,15 @@ export default function ConsentEmbed({ provider, description, children, classNam
 
   if (consented) {
     return (
-      <div className={className}>
+      <div className={cn('relative', className)}>
         {children}
         <button
           type="button"
+          aria-label={`Revoke ${provider} consent`}
           onClick={() => writeConsent(provider, false)}
-          className="mt-3 text-xs text-muted underline underline-offset-2 hover:text-rose-300"
+          className="absolute right-2 top-2 z-10 rounded-sm border border-white/15 bg-black/80 px-2 py-1.5 text-xs text-zinc-300 shadow-sm transition-colors hover:bg-black hover:text-white"
         >
-          Revoke {provider} consent
+          Revoke consent
         </button>
       </div>
     );

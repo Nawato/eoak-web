@@ -14,22 +14,24 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
 
   return (
     <section id="music" className="scroll-mt-20 py-24">
-      <div className="mx-auto max-w-6xl px-4 md:px-8">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
         <h2 className="mb-12 text-center font-display text-4xl font-bold uppercase text-white">
           Music
         </h2>
 
-        <div className="grid items-start gap-12 lg:grid-cols-2">
-          {/* YouTube Player */}
-          <div className="relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-black">
+        <div className="grid items-stretch gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="flex flex-col gap-6">
+            <h3 className="text-center font-display text-2xl font-semibold uppercase text-white">
+              Latest Video
+            </h3>
             {videoId ? (
               <ConsentEmbed
                 provider="YouTube"
                 description="This video is hosted by YouTube."
-                className="absolute inset-0 h-full w-full overflow-auto"
+                className="rounded-sm border border-white/10 bg-black [&>div]:lg:aspect-video"
               >
                 <iframe
-                  className="h-full w-full"
+                  className="block aspect-video w-full"
                   src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
                   title="Latest release video"
                   loading="lazy"
@@ -39,13 +41,12 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
                 />
               </ConsentEmbed>
             ) : (
-              <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-muted">
+              <div className="flex aspect-video w-full items-center justify-center rounded-sm border border-white/10 bg-black p-6 text-center text-sm text-muted">
                 No latest release video configured in Sanity yet.
               </div>
             )}
           </div>
 
-          {/* Spotify Embed */}
           <div className="flex flex-col gap-6">
             <h3 className="text-center font-display text-2xl font-semibold uppercase text-white">
               Featured Release
@@ -54,10 +55,10 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
               <ConsentEmbed
                 provider="Spotify"
                 description="This player is provided by Spotify."
-                className="rounded-sm border border-white/10"
+                className="relative h-[400px] rounded-sm border border-white/10 lg:h-auto lg:flex-1 [&>div]:absolute [&>div]:inset-0 [&>div]:min-h-0 [&>div]:overflow-auto"
               >
                 <iframe
-                  className="h-[400px] w-full"
+                  className="absolute inset-0 block h-full w-full"
                   src={spotifyEmbedUrl}
                   title="Spotify featured release"
                   loading="lazy"
