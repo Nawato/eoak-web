@@ -28,7 +28,7 @@ export default defineType({
       name: 'email',
       title: 'Email',
       type: 'email',
-      initialValue: 'booking@endofallknown.de',
+      initialValue: 'kontakt@endofallknown.de',
     },
     {
       name: 'phone',

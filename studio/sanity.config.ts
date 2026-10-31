@@ -2,6 +2,7 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { visionTool } from '@sanity/vision';
 import { schemaTypes } from './schemaTypes';
+import { structure, singletonTypes } from './structure';
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? 'lru32awc';
 const dataset = process.env.SANITY_STUDIO_DATASET ?? 'production';
@@ -11,8 +12,19 @@ export default defineConfig({
   title: 'End Of All Known',
   projectId,
   dataset,
-  plugins: [structureTool(), visionTool()],
+  plugins: [structureTool({ structure }), visionTool()],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    // Singletons can only be edited, never created or duplicated.
+    actions: (input, context) =>
+      (singletonTypes as readonly string[]).includes(context.schemaType)
+        ? input.filter(({ action }) => action && !['duplicate', 'delete', 'unpublish'].includes(action))
+        : input,
+    newDocumentOptions: (prev, { creationContext }) =>
+      creationContext.type === 'global'
+        ? prev.filter((item) => !(singletonTypes as readonly string[]).includes(item.templateId))
+        : prev,
   },
 });

@@ -1,12 +1,16 @@
 import ConsentEmbed from '@/components/ConsentEmbed';
-import { getSpotifyEmbedUrl, getYouTubeVideoId } from '@/lib/embeds';
+import { getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl } from '@/lib/embeds';
 
 interface MediaSectionProps {
   latestYoutubeUrl: string;
   featuredSpotifyUrl: string;
+  streamingLinks?: { label?: string; url?: string }[];
 }
 
-export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl }: MediaSectionProps) {
+export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, streamingLinks = [] }: MediaSectionProps) {
+  const links = streamingLinks
+    .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
+    .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
   const videoId = getYouTubeVideoId(latestYoutubeUrl);
   const spotifyEmbedUrl = getSpotifyEmbedUrl(featuredSpotifyUrl);
 
@@ -68,6 +72,22 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl }: M
             )}
           </div>
         </div>
+
+        {links.length > 0 && (
+          <div className="mt-12 flex flex-wrap justify-center gap-3">
+            {links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-sm border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

@@ -1,17 +1,19 @@
-import { getSiteSettings, getPressKit } from '@/lib/sanity';
+import { getSiteSettings, getPressKit, getReleases, getMembers } from '@/lib/sanity';
 import type { SanityImageSource } from '@/lib/sanity-image';
 import Hero from '@/components/Hero';
 import MediaSection from '@/components/MediaSection';
 import TourDates from '@/components/TourDates';
 import BioSection from '@/components/BioSection';
 import GallerySection from '@/components/GallerySection';
+import ReleasesSection from '@/components/ReleasesSection';
+import MembersSection from '@/components/MembersSection';
 import ContactSection from '@/components/ContactSection';
-import { siteUrl } from '@/lib/site';
+import { defaultContactEmail, siteUrl } from '@/lib/site';
 import { toHttpsUrl } from '@/lib/embeds';
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  const pressKit = await getPressKit();
+  const [pressKit, releases, members] = await Promise.all([getPressKit(), getReleases(), getMembers()]);
 
   const bandName = settings?.bandName ?? 'End Of All Known';
 
@@ -30,12 +32,23 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
-      <Hero bandName={bandName} />
+      <Hero
+        bandName={bandName}
+        logo={settings?.logo}
+        background={settings?.heroBackground}
+        backgroundAlt={settings?.heroBackgroundAlt}
+        eyebrow={settings?.heroEyebrow}
+        tagline={settings?.heroTagline}
+        merchUrl={toHttpsUrl(settings?.merchUrl)}
+      />
 
       <MediaSection
         latestYoutubeUrl={settings?.latestYoutubeUrl ?? ''}
         featuredSpotifyUrl={settings?.featuredSpotifyUrl ?? ''}
+        streamingLinks={settings?.streamingLinks}
       />
+
+      <ReleasesSection releases={releases} />
 
       <TourDates artistName={settings?.bandsintownArtistName ?? bandName} />
 
@@ -44,6 +57,8 @@ export default async function HomePage() {
         pressRelease={pressKit?.pressRelease ?? undefined}
         pressKitPdfUrl={pressKit?.pressKitPdf?.asset?.url}
       />
+
+      <MembersSection members={members} />
 
       <GallerySection
         gallery={
@@ -57,8 +72,7 @@ export default async function HomePage() {
       />
 
       <ContactSection
-        bookingEmail={settings?.bookingEmail ?? null}
-        managementEmail={settings?.managementEmail ?? null}
+        contactEmail={settings?.contactEmail ?? defaultContactEmail}
       />
     </>
   );

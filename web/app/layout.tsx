@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteSettings } from '@/lib/sanity';
+import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
 const inter = Inter({
@@ -18,7 +19,7 @@ const oswald = Oswald({
   variable: '--font-oswald',
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: siteName,
@@ -40,6 +41,15 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const faviconUrl = hasImage(settings?.favicon) ? getImageUrl(settings.favicon, 256, 256) : undefined;
+  return {
+    ...baseMetadata,
+    icons: { icon: faviconUrl ?? '/icon.svg' },
+  };
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -60,7 +70,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} />
+        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.logo} />
         <main id="main" className="min-h-screen">{children}</main>
         <Footer bandName={bandName} socialLinks={settings?.socialLinks ?? []} />
       </body>

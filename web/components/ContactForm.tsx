@@ -18,10 +18,16 @@ export default function ContactForm({ className }: ContactFormProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    setResult(null);
     startTransition(async () => {
-      const res = await sendContactEmail(formData);
-      setResult(res);
-      if (res.success) formRef.current?.reset();
+      try {
+        const res = await sendContactEmail(formData);
+        setResult(res);
+        if (res.success) formRef.current?.reset();
+      } catch (error) {
+        console.error('Contact request failed:', error);
+        setResult({ success: false, error: 'The email could not be sent. Please try again later.' });
+      }
     });
   }
 
@@ -35,7 +41,9 @@ export default function ContactForm({ className }: ContactFormProps) {
           id="name"
           name="name"
           type="text"
+          autoComplete="name"
           required
+          minLength={2}
           maxLength={100}
           className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
@@ -43,16 +51,21 @@ export default function ContactForm({ className }: ContactFormProps) {
 
       <div>
         <label htmlFor="email" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
-          Email
+          Your email address
         </label>
         <input
           id="email"
           name="email"
           type="email"
+          autoComplete="email"
+          aria-describedby="email-help"
           required
           maxLength={254}
           className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
+        <p id="email-help" className="mt-2 text-sm text-muted">
+          Enter your own email address so we can reply to you.
+        </p>
       </div>
 
       <div>
@@ -63,6 +76,7 @@ export default function ContactForm({ className }: ContactFormProps) {
           id="message"
           name="message"
           required
+          minLength={10}
           maxLength={5000}
           rows={6}
           className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"

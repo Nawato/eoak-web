@@ -2,12 +2,15 @@
 
 import { headers } from 'next/headers';
 import { Resend } from 'resend';
+import { getSiteSettings } from '@/lib/sanity';
+import { defaultContactEmail } from '@/lib/site';
 
 const MAX_NAME = 100;
 const MAX_EMAIL = 254;
 const MAX_MESSAGE = 5000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const recentSubmissions = new Map<string, number[]>();
 
 function escapeHtml(value: string): string {
@@ -59,7 +62,7 @@ export async function sendContactEmail(formData: FormData): Promise<SendContactE
   if (trimmedName.length < 2 || trimmedName.length > MAX_NAME) {
     return { success: false, error: 'Please enter your name.' };
   }
-  if (trimmedEmail.length > MAX_EMAIL || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+  if (trimmedEmail.length > MAX_EMAIL || !EMAIL_PATTERN.test(trimmedEmail)) {
     return { success: false, error: 'Please enter a valid email address.' };
   }
   if (trimmedMessage.length < 10 || trimmedMessage.length > MAX_MESSAGE) {
@@ -86,13 +89,20 @@ export async function sendContactEmail(formData: FormData): Promise<SendContactE
   const resend = new Resend(apiKey);
 
   try {
+    // Ignore legacy booking/management addresses and all client-supplied recipients.
+    const recipient = (await getSiteSettings())?.contactEmail ?? defaultContactEmail;
+    if (recipient.length > MAX_EMAIL || !EMAIL_PATTERN.test(recipient)) {
+      console.error('Invalid contact email in Sanity Site Settings.');
+      return { success: false, error: 'The email could not be sent. Please try again later.' };
+    }
+
     const { error } = await resend.emails.send({
-      from: 'End Of All Known <booking@endofallknown.de>',
-      to: process.env.CONTACT_EMAIL_RECIPIENT ?? 'booking@endofallknown.de',
+      from: `End Of All Known <${process.env.CONTACT_FROM_EMAIL ?? defaultContactEmail}>`,
+      to: recipient,
       replyTo: trimmedEmail,
       subject: `End Of All Known – Contact from ${trimmedName}`,
       text: `Name: ${trimmedName}\nEmail: ${trimmedEmail}\n\n${trimmedMessage}`,
-      html: `<p>Hi End Of All Known,</p><p><strong>${escapeHtml(trimmedName)}</strong> (${escapeHtml(trimmedEmail)}) wrote:</p><p>${escapeHtml(trimmedMessage).replace(/\n/g, '<br />')}</p>`,
+      html: `<p>Contact inquiry:</p><p><strong>${escapeHtml(trimmedName)}</strong> (${escapeHtml(trimmedEmail)}) wrote:</p><p>${escapeHtml(trimmedMessage).replace(/\n/g, '<br />')}</p>`,
     });
 
     if (error) {
