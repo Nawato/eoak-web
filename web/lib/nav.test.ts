@@ -12,7 +12,8 @@ describe('content-aware navigation', () => {
     expect(links.some((link) => link.href === '/#releases')).toBe(hasReleases);
     expect(links.some((link) => link.href === '/#band')).toBe(hasMembers);
     expect(links.map((link) => link.href)).toEqual(expect.arrayContaining([
-      '/#music', '/#shows', '/#bio', '/#gallery', '/#contact',
+      '/#music', '/#shows', '/#bio', '/#contact',
     ]));
+    expect(links.some((link) => link.href === '/#gallery')).toBe(false);
   });
 });

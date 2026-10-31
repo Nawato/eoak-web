@@ -1,6 +1,7 @@
 import Link from 'next/link';
+import SocialIcon from '@/components/SocialIcon';
 import { toHttpsUrl } from '@/lib/embeds';
-import type { SocialLink, PhotoCredit } from '@/sanity/types';
+import { socialPlatforms, type SocialLink, type PhotoCredit } from '@/sanity/types';
 
 interface FooterProps {
   bandName: string;
@@ -52,16 +53,18 @@ export default function Footer({ bandName, socialLinks = [], creditsHeading, pho
         <div className="flex items-center gap-4">
           {socialLinks.map((link, index) => {
             const href = toHttpsUrl(link.url);
-            if (!href) return null;
+            const platform = socialPlatforms.find((item) => item.value === link.platform);
+            if (!href || !platform) return null;
             return (
               <a
                 key={`${link.platform}-${index}`}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted capitalize transition-colors hover:text-accent"
+                aria-label={platform.label}
+                className="text-muted transition-colors hover:text-accent"
               >
-                {link.platform}
+                <SocialIcon platform={platform.value} className="h-5 w-5" />
               </a>
             );
           })}

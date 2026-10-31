@@ -6,7 +6,6 @@ const areas = [
   ['shows', 'Tour Dates'],
   ['bio', 'Bio / Press'],
   ['band', 'The Band'],
-  ['gallery', 'Gallery'],
   ['contact', 'Contact'],
   ['impressum', 'Impressum'],
   ['privacy', 'Privacy / Datenschutz'],

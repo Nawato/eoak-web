@@ -1,11 +1,9 @@
 import { getSiteSettings, getPressKit, getReleases, getMembers } from '@/lib/sanity';
-import type { SanityImageSource } from '@/lib/sanity-image';
 import Hero from '@/components/Hero';
 import BackgroundSurface from '@/components/BackgroundSurface';
 import MediaSection from '@/components/MediaSection';
 import TourDates from '@/components/TourDates';
 import BioSection from '@/components/BioSection';
-import GallerySection from '@/components/GallerySection';
 import ReleasesSection from '@/components/ReleasesSection';
 import MembersSection from '@/components/MembersSection';
 import ContactSection from '@/components/ContactSection';
@@ -77,17 +75,6 @@ export default async function HomePage() {
           <MembersSection members={members} />
         </BackgroundSurface>
       )}
-
-      <BackgroundSurface background={settings?.pageBackgrounds?.gallery}>
-        <GallerySection
-          gallery={(pressKit?.gallery ?? [])
-            .filter((item) => (item.image as { asset?: unknown } | null | undefined)?.asset)
-            .map((item) => ({
-              ...item,
-              image: item.image as SanityImageSource,
-            }))}
-        />
-      </BackgroundSurface>
 
       <BackgroundSurface background={settings?.pageBackgrounds?.contact}>
         <ContactSection contactEmail={settings?.contactEmail ?? defaultContactEmail} />

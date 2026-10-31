@@ -41,35 +41,5 @@ export default defineType({
       type: 'file',
       description: 'Optional fallback download, shown only when no complete press kit link is configured.',
     },
-    {
-      name: 'gallery',
-      title: 'Gallery',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          name: 'galleryImage',
-          fields: [
-            {
-              name: 'image',
-              title: 'Image',
-              type: 'image',
-              validation: (rule) => rule.required(),
-            },
-            {
-              name: 'caption',
-              title: 'Caption',
-              type: 'string',
-            },
-            {
-              name: 'isHighRes',
-              title: 'High Resolution',
-              type: 'boolean',
-              initialValue: false,
-            },
-          ],
-        },
-      ],
-    },
   ],
 });

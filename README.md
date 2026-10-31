@@ -6,7 +6,7 @@ Official website of the metalcore band **End Of All Known**. A Next.js frontend 
 
 - Hero with band photo background and logo (PNG or SVG), both editable in Sanity
 - Discography, band members, streaming links and merch button
-- Music (YouTube and Spotify embeds, loaded only after consent), tour dates (Bandsintown), bio and press release, gallery with lightbox, press kit PDF
+- Music (YouTube and Spotify embeds, loaded only after consent), tour dates (Bandsintown), bio and press release, press kit PDF
 - One contact form for booking and management, sent to `kontakt@endofallknown.de`; visitors must provide their own email for replies
 - Impressum and Datenschutz pages, sitemap, robots, Open Graph image
 - Security headers and CSP, honeypot and rate limiting on the contact form, signed webhook for cache revalidation
@@ -56,7 +56,7 @@ Never commit `.env.local` or put secrets in `NEXT_PUBLIC_` variables.
 The Studio has three single documents plus two lists (**Releases** and **Band Members**, ordered by release date / order number):
 
 - **Site Settings** – band name, logo, hero background photo (with hotspot and alt text), hero text, share image, favicon, social links, YouTube and Spotify URLs, streaming and merch links, Bandsintown name, contact email
-- **Press Kit** – biography, press release, complete press kit link (e.g. Google Drive), editable button label, optional fallback PDF, gallery
+- **Press Kit** – biography, press release, complete press kit link (e.g. Google Drive), editable button label, optional fallback PDF
 - **Impressum** – legal details
 
 Until a logo or photo is uploaded, the site shows the band name and a gradient background.
@@ -65,9 +65,9 @@ Until a logo or photo is uploaded, the site shows the band name and a gradient b
 
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
 
-Under **Site Settings → Page & Section Backgrounds**, set independent photos for Music, Releases, Tour Dates, Bio / Press, The Band, Gallery, Contact, Impressum and Privacy / Datenschutz. Each has a hotspot, optional image description and darkening control (default 65%). Photos fade into the page at the edges; areas without an image keep their original styling. The hero uses its existing separate settings.
+Under **Site Settings → Page & Section Backgrounds**, set independent photos for Music, Releases, Tour Dates, Bio / Press, The Band, Contact, Impressum and Privacy / Datenschutz. Each has a hotspot, optional image description and darkening control (default 65%). Photos fade into the page at the edges; areas without an image keep their original styling. The hero uses its existing separate settings.
 
-Add photographers under **Site Settings → Photographer Credits** with their names, optional websites/social profiles and photo attributions (e.g. live photos, member portraits or hero photo). Reorder entries by dragging them in Sanity. They appear at the bottom of every page; **Credits Heading** controls the section title. The section stays hidden until credits are added. Upload live pictures through **Press Kit → Gallery**, and member portraits through **Band Members**.
+Add photographers under **Site Settings → Photographer Credits** with their names, optional websites/social profiles and photo attributions (e.g. live photos, member portraits or hero photo). Reorder entries by dragging them in Sanity. They appear at the bottom of every page; **Credits Heading** controls the section title. The section stays hidden until credits are added. Upload member portraits through **Band Members**; additional press photos can remain in your linked Google Drive EPK.
 
 For the complete press kit, paste your Google Drive folder URL into **Press Kit → Complete Press Kit Link**. In Google Drive, set sharing to **Anyone with the link → Viewer** and check access in a signed-out browser. The button opens the folder in a new tab; Google Drive is not embedded or loaded before a click. If no valid HTTPS link is configured, the existing PDF download remains available.
 
@@ -107,3 +107,7 @@ npm test         # Vitest
 ## Deployment
 
 Deploy `web/` (for example on Vercel with `web` as the root directory). Set all environment variables above in the host, add the production origin to Sanity CORS, and configure the revalidation webhook.
+
+## Third-party icons
+
+Social brand logos use [Simple Icons](https://simpleicons.org/). See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for licensing and trademark information. Social profile links remain editable in Sanity Site Settings.

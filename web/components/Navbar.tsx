@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import MobileNav from '@/components/MobileNav';
+import SocialIcon from '@/components/SocialIcon';
 import type { NavLink } from '@/lib/nav';
 import { toHttpsUrl } from '@/lib/embeds';
 import { getLogo } from '@/lib/sanity-image';
@@ -46,19 +47,19 @@ export default function Navbar({ bandName, socialLinks = [], logo, links }: Navb
 
         <div className="flex items-center gap-3">
           {socialLinks.map((link, index) => {
-            const Icon = socialPlatforms.find((platform) => platform.value === link.platform)?.icon;
+            const platform = socialPlatforms.find((platform) => platform.value === link.platform);
             const href = toHttpsUrl(link.url);
-            if (!Icon || !href) return null;
+            if (!platform || !href) return null;
             return (
               <a
                 key={`${link.platform}-${index}`}
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={link.platform}
+                aria-label={platform.label}
                 className="text-muted transition-colors hover:text-accent"
               >
-                <Icon className="h-5 w-5" />
+                <SocialIcon platform={platform.value} className="h-5 w-5" />
               </a>
             );
           })}
