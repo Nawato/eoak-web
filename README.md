@@ -137,6 +137,8 @@ npm run lint     # ESLint
 npm test         # Vitest
 ```
 
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, type checks, tests and the production build for `web/`, and type checks plus schema validation for `studio/`, on every push to `main` and every pull request. Dependabot (`.github/dependabot.yml`) opens weekly grouped dependency updates.
+
 ## Deployment
 
 Deploy `web/` (for example on Vercel with `web` as the root directory). Set all environment variables above in the host, add the production origin to Sanity CORS, and configure the revalidation webhook.

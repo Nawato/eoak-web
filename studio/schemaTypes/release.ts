@@ -14,7 +14,7 @@ export default defineType({
       initialValue: 'Single',
     },
     { name: 'releaseDate', title: 'Release Date', type: 'date', validation: (Rule) => Rule.required() },
-    { name: 'cover', title: 'Cover Art', type: 'image', validation: (Rule) => Rule.required() },
+    { name: 'cover', title: 'Cover Art', type: 'image', options: { hotspot: true }, validation: (Rule) => Rule.required() },
     {
       name: 'links',
       title: 'Listen Links',

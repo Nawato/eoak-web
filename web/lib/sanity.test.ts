@@ -5,7 +5,8 @@ const { fetch, createClient } = vi.hoisted(() => {
   return { fetch, createClient: vi.fn(() => ({ fetch })) };
 });
 
-vi.mock('next-sanity', () => ({ createClient }));
+vi.mock('server-only', () => ({}));
+vi.mock('next-sanity', () => ({ createClient, defineQuery: (query: string) => query }));
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -25,6 +26,7 @@ describe('Sanity content freshness', () => {
 
     expect(createClient).toHaveBeenCalledWith(expect.objectContaining({
       useCdn: false,
+      perspective: 'published',
     }));
     expect(fetch).toHaveBeenCalledTimes(4);
     for (const call of fetch.mock.calls) {

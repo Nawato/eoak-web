@@ -1,5 +1,6 @@
+import 'server-only';
 import { cache } from 'react';
-import { createClient } from 'next-sanity';
+import { createClient, defineQuery } from 'next-sanity';
 import type { PressKit, SocialLink, PhotoCredit, BackgroundArea, BackgroundSettings } from '@/sanity/types';
 import type { LabeledLink } from '@/lib/embeds';
 
@@ -18,6 +19,8 @@ export const sanityClient = createClient({
   apiVersion: '2024-01-01',
   // Next.js caches responses already; the API CDN could hand stale data to a webhook-triggered revalidation.
   useCdn: false,
+  // Never serve drafts, even if a read token is configured.
+  perspective: 'published',
   token,
 });
 
@@ -83,11 +86,38 @@ export interface Impressum {
   additionalPrivacyDetails?: string | null;
 }
 
-export const getSiteSettings = cache(() => fetchContent<SiteSettings | null>(`*[_id == "siteSettings"][0]`));
+// Missing fields are returned as null (not omitted), so arrays are coalesced.
+// Explicit projections keep responses small and avoid leaking unused fields to the renderer.
+const SITE_SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0]{
+  bandName, instagramHeading, instagramFollowLabel, "socialLinks": coalesce(socialLinks, []), latestYoutubeUrl, featuredSpotifyUrl,
+  bandsintownArtistName, bandsintownUrl, contactEmail, "streamingLinks": coalesce(streamingLinks, []), merchUrl, logo, headerLogo,
+  heroBackground, heroBackgroundAlt, heroOverlayOpacity, heroEyebrow, heroTagline, ogImage, favicon,
+  creditsHeading, "photoCredits": coalesce(photoCredits, []), pageBackgrounds
+}`);
 
-export const getPressKit = cache(() => fetchContent<PressKit | null>(`*[_id == "pressKit"][0]{..., pressKitPdf{..., asset->{url}}}`));
+const PRESS_KIT_QUERY = defineQuery(`*[_id == "pressKit"][0]{
+  biography, pressRelease, "pressKitPdf": pressKitPdf{ "asset": asset->{ url } }, pressKitUrl, pressKitLinkLabel
+}`);
 
-export const getImpressum = cache(() => fetchContent<Impressum | null>(`*[_id == "impressum"][0]`));
+const IMPRESSUM_QUERY = defineQuery(`*[_id == "impressum"][0]{
+  legalNotice, operatorName, operatorAddress, email, phone, representedBy, legalForm, registerDetails, vatId,
+  businessId, editorialResponsible, disputeResolution, additionalLegalDetails, hostingDetails,
+  emailProcessingDetails, internationalTransfers, supervisoryAuthority, dataProtectionOfficer, additionalPrivacyDetails
+}`);
+
+const RELEASES_QUERY = defineQuery(
+  `*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]{ _id, title, releaseType, releaseDate, cover, "links": coalesce(links, []) }`,
+);
+
+const MEMBERS_QUERY = defineQuery(
+  `*[_type == "member" && !(_id in path("drafts.**"))] | order(order asc, name asc)[0...30]{ _id, name, role, photo }`,
+);
+
+export const getSiteSettings = cache(() => fetchContent<SiteSettings | null>(SITE_SETTINGS_QUERY));
+
+export const getPressKit = cache(() => fetchContent<PressKit | null>(PRESS_KIT_QUERY));
+
+export const getImpressum = cache(() => fetchContent<Impressum | null>(IMPRESSUM_QUERY));
 
 export interface Release {
   _id: string;
@@ -105,10 +135,6 @@ export interface Member {
   photo?: unknown;
 }
 
-export const getReleases = cache(() =>
-  fetchContent<Release[]>(`*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]`),
-);
+export const getReleases = cache(() => fetchContent<Release[]>(RELEASES_QUERY));
 
-export const getMembers = cache(() =>
-  fetchContent<Member[]>(`*[_type == "member" && !(_id in path("drafts.**"))] | order(order asc, name asc)[0...30]`),
-);
+export const getMembers = cache(() => fetchContent<Member[]>(MEMBERS_QUERY));

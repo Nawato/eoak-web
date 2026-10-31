@@ -70,8 +70,8 @@ export interface LabeledLink {
   url?: string;
 }
 
-export function getHttpsLinks(links: LabeledLink[] = []): { label: string; href: string }[] {
-  return links
+export function getHttpsLinks(links?: LabeledLink[] | null): { label: string; href: string }[] {
+  return (links ?? [])
     .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
     .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
 }

@@ -99,6 +99,7 @@ export default defineType({
       title: 'Social Sharing Image',
       type: 'image',
       description: 'Image shown when the site is shared (1200x630 recommended). Falls back to a generated image.',
+      options: { hotspot: true },
     },
     {
       name: 'favicon',

@@ -62,6 +62,7 @@ describe('toHttpsUrl', () => {
     it('returns no buttons for omitted or empty links', () => {
       expect(getHttpsLinks()).toEqual([]);
       expect(getHttpsLinks([])).toEqual([]);
+      expect(getHttpsLinks(null)).toEqual([]);
     });
   });
 });
