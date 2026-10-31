@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from 'next-sanity';
 import { toHttpsUrl } from '@/lib/embeds';
@@ -32,9 +33,33 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const userAgent = request.headers.get('user-agent') ?? '';
   if (writeToken && userAgent && !BOT_PATTERN.test(userAgent)) {
-    const path = `links[_key=="${key.replace(/[^\w-]/g, '')}"].clicks`;
+    const safeKey = key.replace(/[^\w-]/g, '');
+    const clicks = `links[_key=="${safeKey}"].clicks`;
+    const unique = `links[_key=="${safeKey}"].uniqueClicks`;
+    // Per-day hash: the IP itself is never stored and hashes cannot be linked across days.
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? '';
+    const day = new Date().toISOString().slice(0, 10);
+    const hash = createHash('sha256').update(`${day}|${writeToken}|${ip}|${userAgent}`).digest('hex').slice(0, 32);
+    const hashId = `clickHash.${id.replace(/[^\w-]/g, '')}.${safeKey}.${hash}`;
+    const base = client.patch(id).setIfMissing({ [clicks]: 0, [unique]: 0 });
+
     try {
-      await client.patch(id).setIfMissing({ [path]: 0 }).inc({ [path]: 1 }).commit({ visibility: 'async' });
+      try {
+        // Creating an existing document fails, which makes the whole transaction (including the unique counter) fail.
+        await client
+          .transaction()
+          .create({ _id: hashId, _type: 'clickHash', day })
+          .patch(base.inc({ [clicks]: 1, [unique]: 1 }))
+          .commit({ visibility: 'async' });
+      } catch (error) {
+        if ((error as { statusCode?: number }).statusCode !== 409) throw error;
+        await client.patch(id).setIfMissing({ [clicks]: 0 }).inc({ [clicks]: 1 }).commit({ visibility: 'async' });
+      }
+      // Occasional cleanup so hash documents do not pile up.
+      if (Math.random() < 0.02) {
+        const cutoff = new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10);
+        await client.delete({ query: '*[_type == "clickHash" && day < $cutoff]', params: { cutoff } });
+      }
     } catch (error) {
       console.error('Counting release click failed:', error);
     }

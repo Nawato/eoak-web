@@ -48,10 +48,21 @@ export default defineType({
               readOnly: true,
               initialValue: 0,
             },
+            {
+              name: 'uniqueClicks',
+              title: 'Unique clicks (per day)',
+              type: 'number',
+              description: 'Distinct visitors per day, based on a daily-rotating hash. No IP addresses are stored.',
+              readOnly: true,
+              initialValue: 0,
+            },
           ],
           preview: {
-            select: { title: 'label', url: 'url', clicks: 'clicks' },
-            prepare: ({ title, url, clicks }) => ({ title, subtitle: `${clicks ?? 0} clicks · ${url ?? ''}` }),
+            select: { title: 'label', url: 'url', clicks: 'clicks', unique: 'uniqueClicks' },
+            prepare: ({ title, url, clicks, unique }) => ({
+              title,
+              subtitle: `${clicks ?? 0} clicks (${unique ?? 0} unique) · ${url ?? ''}`,
+            }),
           },
         },
       ],
