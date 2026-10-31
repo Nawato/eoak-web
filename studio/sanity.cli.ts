@@ -5,5 +5,7 @@ export default defineCliConfig({
     projectId: process.env.SANITY_STUDIO_PROJECT_ID ?? 'lru32awc',
     dataset: process.env.SANITY_STUDIO_DATASET ?? 'production',
   },
-  autoUpdates: true,
+  deployment: {
+    autoUpdates: true,
+  },
 });
