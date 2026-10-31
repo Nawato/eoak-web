@@ -24,7 +24,7 @@ describe('Sanity content freshness', () => {
     await Promise.all([getSiteSettings(), getPressKit(), getReleases(), getMembers()]);
 
     expect(createClient).toHaveBeenCalledWith(expect.objectContaining({
-      useCdn: environment === 'production',
+      useCdn: false,
     }));
     expect(fetch).toHaveBeenCalledTimes(4);
     for (const call of fetch.mock.calls) {

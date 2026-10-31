@@ -99,6 +99,16 @@ describe('Instagram feed API', () => {
     expect(vi.mocked(console.error).mock.calls.flat().join(' ')).not.toContain('secret-test-token');
   });
 
+  it('skips unsupported items but keeps the rest of the feed', async () => {
+    fetchMock.mockResolvedValue(
+      Response.json({ data: [media(0), media(1, { media_type: 'VIDEO' }), media(2, { media_url: 'https://evil.com/a.jpg' })] }),
+    );
+    const feed = await getInstagramFeed();
+    expect(feed.status).toBe('ready');
+    expect(feed.posts.map((post) => post.id)).toEqual(['0']);
+    expect(console.error).toHaveBeenCalled();
+  });
+
   it('reports expired tokens without logging response bodies', async () => {
     fetchMock.mockResolvedValue(Response.json({ error: 'secret-test-token' }, { status: 401 }));
     expect((await getInstagramFeed()).status).toBe('unavailable');

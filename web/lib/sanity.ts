@@ -16,7 +16,8 @@ export const sanityClient = createClient({
   projectId,
   dataset,
   apiVersion: '2024-01-01',
-  useCdn: !token && !isDevelopment,
+  // Next.js caches responses already; the API CDN could hand stale data to a webhook-triggered revalidation.
+  useCdn: false,
   token,
 });
 

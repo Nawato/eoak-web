@@ -94,15 +94,16 @@ export const getInstagramFeed = cache(async (): Promise<InstagramFeed> => {
     console.error('Instagram feed returned an invalid response.');
     return { status: 'unavailable', posts: [] };
   }
-  const posts = payload.data.map(parsePost);
-  if (posts.some((post) => post === null)) {
-    console.error('Instagram feed returned an invalid or unsupported media item.');
-    return { status: 'unavailable', posts: [] };
+  const parsed = payload.data.map(parsePost);
+  const posts = parsed.filter((post): post is InstagramPost => post !== null);
+  // Skip single unsupported items (e.g. videos without a thumbnail) instead of hiding the whole feed.
+  if (posts.length < parsed.length) {
+    console.error(`Instagram feed skipped ${parsed.length - posts.length} invalid or unsupported media item(s).`);
+    if (posts.length === 0) return { status: 'unavailable', posts: [] };
   }
   return {
     status: 'ready',
     posts: posts
-      .filter((post): post is InstagramPost => post !== null)
       .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
       .filter((post, index, all) => all.findIndex((other) => other.id === post.id) === index)
       .slice(0, 6),

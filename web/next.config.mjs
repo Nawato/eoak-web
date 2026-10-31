@@ -31,6 +31,8 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'cdn.sanity.io',
+        // Only optimize images from this project, not arbitrary Sanity-hosted files.
+        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
       },
     ],
   },

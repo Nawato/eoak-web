@@ -15,13 +15,20 @@ interface BandsintownWindow extends Window {
 export default function BandsintownWidget({ artistName }: { artistName: string }) {
   const container = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
+  const pendingReady = useRef<(() => void) | null>(null);
 
-  useEffect(() => () => {
-    const bit = (window as BandsintownWindow).BIT;
-    if (bit?.onReady === initialize) delete bit.onReady;
-  });
+  // Drop a still-pending vendor callback on unmount (e.g. after consent is revoked).
+  useEffect(
+    () => () => {
+      const bit = (window as BandsintownWindow).BIT;
+      if (bit && pendingReady.current && bit.onReady === pendingReady.current) delete bit.onReady;
+      pendingReady.current = null;
+    },
+    [],
+  );
 
   function initialize() {
+    pendingReady.current = null;
     const initializer = (window as BandsintownWindow).BIT?.widgetInitializer;
     if (!container.current || !initializer) {
       console.error('Bandsintown widget failed to initialize.');
@@ -54,6 +61,7 @@ export default function BandsintownWidget({ artistName }: { artistName: string }
           if (bitWindow.BIT?.widgetInitializer) initialize();
           else {
             bitWindow.BIT = bitWindow.BIT || {};
+            pendingReady.current = initialize;
             bitWindow.BIT.onReady = initialize;
           }
         }}
