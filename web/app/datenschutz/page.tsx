@@ -70,10 +70,17 @@ export default async function DatenschutzPage() {
             <h2>5. Eingebettete Inhalte von Drittanbietern</h2>
             <p>
               Diese Website bindet Inhalte von YouTube (Google Ireland Limited, Irland; Einbettung im erweiterten
-              Datenschutzmodus), Spotify (Spotify AB, Schweden) und Bandsintown (Bandsintown, Inc., USA) ein. Diese
+              Datenschutzmodus), Spotify (Spotify AB, Schweden), Instagram (Meta Platforms Ireland Limited,
+              Irland; mögliche Übermittlung in die USA) und Bandsintown (Bandsintown, Inc., USA) ein. Diese
               Inhalte werden erst geladen, nachdem Sie auf die jeweilige Schaltfläche geklickt und damit eingewilligt
               haben (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Beim Laden wird Ihre IP-Adresse an den jeweiligen
               Anbieter übermittelt, der außerdem Cookies oder ähnliche Technologien einsetzen kann.
+            </p>
+            <p className="mt-3">
+              Die Instagram-Fotos werden serverseitig über die Instagram-API abgerufen und für bis zu 15 Minuten
+              zwischengespeichert. Erst nach Ihrer Einwilligung lädt Ihr Browser die Bilder vom Meta-CDN
+              (cdninstagram.com bzw. fbcdn.net). Es wird keine Instagram-Bedienoberfläche eingebettet; ein Klick
+              auf ein Foto öffnet den ursprünglichen Beitrag auf Instagram.
             </p>
             <p className="mt-3">
               Ihre Einwilligung wird in Ihrem Browser (localStorage) gespeichert. Ist dieser Speicher gesperrt, gilt

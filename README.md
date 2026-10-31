@@ -48,6 +48,7 @@ cd studio && npx sanity cors add http://localhost:3000 --credentials
 | `CONTACT_FROM_EMAIL` | Sender address on a domain verified in Resend; defaults to `kontakt@endofallknown.de` |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URL, sitemap, Open Graph |
 | `SANITY_REVALIDATE_SECRET` | Secret for the revalidation webhook |
+| `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID` | Server-only Instagram professional account token and numeric user ID for the latest-six photo feed |
 
 Never commit `.env.local` or put secrets in `NEXT_PUBLIC_` variables.
 
@@ -61,9 +62,15 @@ The Studio has three single documents plus two lists (**Releases** and **Band Me
 
 Until a logo or photo is uploaded, the site shows the band name and a gradient background.
 
+**Site Settings** is organized into **Site-wide** (branding, social links, sharing and footer credits), **Home Page** (hero, music, tour dates, Instagram and contact), and **Page Backgrounds**. Backgrounds have separate tabs for **Home Page**, **Impressum**, and **Privacy / Datenschutz**. Press text, releases, members and Impressum content remain in their dedicated documents. This organization does not move or reset any saved content or assets.
+
 **Site Settings → Hero Logo** controls the large front-page logo; **Header Logo** controls the compact navigation logo independently. Both accept PNG, SVG or WebP. An unset header logo shows the band name as text, not the hero logo.
 
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
+
+Tour dates require **Load Bandsintown content** consent. Set the exact band profile name in **Home Page → Tour Dates → Bandsintown Artist Name**. Past dates are hidden. The widget uses Bandsintown's JSONP event endpoint, so `rest.bandsintown.com` must be permitted by both `script-src` and `connect-src` in the website CSP. A direct Bandsintown search link remains available if an ad blocker or network error prevents loading.
+
+Set **Site Settings → Home Page → Tour Dates → Bandsintown Link** to change the destination of **View shows on Bandsintown** (HTTPS). Leave it empty to keep the artist-name search fallback. This link does not change the artist used by the embedded widget.
 
 Under **Site Settings → Page & Section Backgrounds**, set independent photos for Music, Releases, Tour Dates, Bio / Press, The Band, Contact, Impressum and Privacy / Datenschutz. Each has a hotspot, optional image description and darkening control (default 65%). Photos fade into the page at the edges; areas without an image keep their original styling. The hero uses its existing separate settings.
 
@@ -88,8 +95,20 @@ In production, content is cached for 60 seconds. For faster updates, create a we
 - URL: `https://<your-domain>/api/revalidate`
 - Method POST, with a secret equal to `SANITY_REVALIDATE_SECRET`
 
-## Contact form
+## Latest Instagram photos
 
+The website automatically displays the account's latest six posts as complete images, without Instagram's embed UI. Carousel posts show their cover image; videos/reels show their thumbnail and open the original post when clicked. Fewer than six posts are shown if the account has fewer posts. Photos load only after visitor consent, directly from Meta's CDN. No scraping or third-party feed subscription is used.
+
+Setup requires the band's **Business or Creator** Instagram account:
+
+1. Create a Meta developer app with **Instagram API with Instagram Login**, and connect the band's account under **Instagram → API setup with Instagram business login**. For an account you own/manage, Standard Access is sufficient; add the account to the app.
+2. Grant `instagram_business_basic` and use **Generate token** beside the account in the Meta App Dashboard. Store the long-lived token as `INSTAGRAM_ACCESS_TOKEN` in `web/.env.local` and your deployment host's environment settings.
+3. Obtain the numeric Instagram user ID from the `/me?fields=user_id,username` endpoint using that token; set it as `INSTAGRAM_USER_ID`. The profile username/URL is not a user ID. See [Meta's setup guide](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/get-started).
+4. Restart/redeploy the website. API responses are cached for 15 minutes; updates appear on subsequent visits after cache revalidation. Long-lived tokens expire after 60 days: refresh them using Meta's refresh endpoint before expiry or generate a replacement and update the host. This site does not implement OAuth or automatic token renewal.
+
+The section and navigation link are hidden until credentials are configured. Invalid/expired credentials or API outages produce an unavailable message with the follow link; diagnostic errors are logged server-side without tokens. The section heading (also used in navigation), follow button label and background remain editable in Sanity. The follow link uses the Instagram entry under **Social Links**. Previously curated post URLs are no longer used. Deploy the updated Studio and website, including the updated image CSP.
+
+## Contact delivery
 All inquiries go to the single **Contact Email** in Sanity Site Settings, defaulting to `kontakt@endofallknown.de` if that field is not yet set. Legacy booking/management fields and recipient environment variables are no longer used.
 
 Visitors must enter their own valid email address. It is included in the message and used as **Reply-To**, so replying reaches the visitor. The **From** address stays on your Resend-verified domain to avoid spoofing visitors' addresses and failing email authentication.

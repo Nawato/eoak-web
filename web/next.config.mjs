@@ -2,9 +2,9 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ''}https://widget.bandsintown.com`,
+  `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ''}https://widget.bandsintown.com https://rest.bandsintown.com`,
   "style-src 'self' 'unsafe-inline' https://*.bandsintown.com",
-  "img-src 'self' data: blob: https://cdn.sanity.io https://*.bandsintown.com",
+  "img-src 'self' data: blob: https://cdn.sanity.io https://*.bandsintown.com https://*.cdninstagram.com https://*.fbcdn.net",
   "font-src 'self' data:",
   "connect-src 'self' https://*.bandsintown.com",
   'frame-src https://www.youtube-nocookie.com https://open.spotify.com https://*.bandsintown.com',

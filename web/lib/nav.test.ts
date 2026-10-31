@@ -3,6 +3,26 @@ import { getNavLinks } from './nav';
 
 describe('content-aware navigation', () => {
   it.each([
+    [' Band updates ', 'Band updates'],
+    ['', 'From Instagram'],
+    ['   ', 'From Instagram'],
+    [null, 'From Instagram'],
+    [undefined, 'From Instagram'],
+  ])('uses the Instagram section heading (%s) as its navigation label', (instagramHeading, label) => {
+    const links = getNavLinks({ hasReleases: false, hasMembers: false, hasInstagram: true, instagramHeading });
+    expect(links.find((link) => link.href === '/#instagram')?.label).toBe(label);
+  });
+  it('shows Instagram only when the feed is configured', () => {
+    expect(
+      getNavLinks({ hasReleases: false, hasMembers: false, hasInstagram: true }).some(
+        (link) => link.href === '/#instagram',
+      ),
+    ).toBe(true);
+    expect(getNavLinks({ hasReleases: false, hasMembers: false }).some((link) => link.href === '/#instagram')).toBe(
+      false,
+    );
+  });
+  it.each([
     [false, false],
     [true, false],
     [false, true],
@@ -11,9 +31,9 @@ describe('content-aware navigation', () => {
     const links = getNavLinks({ hasReleases, hasMembers });
     expect(links.some((link) => link.href === '/#releases')).toBe(hasReleases);
     expect(links.some((link) => link.href === '/#band')).toBe(hasMembers);
-    expect(links.map((link) => link.href)).toEqual(expect.arrayContaining([
-      '/#music', '/#shows', '/#bio', '/#contact',
-    ]));
+    expect(links.map((link) => link.href)).toEqual(
+      expect.arrayContaining(['/#music', '/#shows', '/#bio', '/#contact']),
+    );
     expect(links.some((link) => link.href === '/#gallery')).toBe(false);
   });
 });

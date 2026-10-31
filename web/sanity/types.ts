@@ -28,7 +28,7 @@ export interface BackgroundSettings {
 
 export type BackgroundArea =
   | 'music' | 'releases' | 'shows' | 'bio' | 'band'
-  | 'contact' | 'impressum' | 'privacy';
+  | 'instagram' | 'contact' | 'impressum' | 'privacy';
 
 export interface PortableTextSpan {
   _key?: string;

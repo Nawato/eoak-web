@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteSettings, getReleases, getMembers } from '@/lib/sanity';
 import { getNavLinks } from '@/lib/nav';
+import { getInstagramFeed } from '@/lib/instagram';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
@@ -56,8 +57,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const [settings, releases, members] = await Promise.all([getSiteSettings(), getReleases(), getMembers()]);
-  const links = getNavLinks({ hasReleases: releases.length > 0, hasMembers: members.length > 0 });
+  const [settings, releases, members, instagramFeed] = await Promise.all([
+    getSiteSettings(),
+    getReleases(),
+    getMembers(),
+    getInstagramFeed(),
+  ]);
+  const links = getNavLinks({
+    hasReleases: releases.length > 0,
+    hasMembers: members.length > 0,
+    hasInstagram: instagramFeed.status !== 'unconfigured',
+    instagramHeading: settings?.instagramHeading,
+  });
   const bandName = settings?.bandName ?? 'End Of All Known';
 
   return (
@@ -72,8 +83,15 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.headerLogo} links={links} />
-        <main id="main" className="min-h-screen">{children}</main>
+        <Navbar
+          bandName={bandName}
+          socialLinks={settings?.socialLinks ?? []}
+          logo={settings?.headerLogo}
+          links={links}
+        />
+        <main id="main" className="min-h-screen">
+          {children}
+        </main>
         <Footer
           bandName={bandName}
           socialLinks={settings?.socialLinks ?? []}

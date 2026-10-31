@@ -1,5 +1,6 @@
 import { getSiteSettings, getPressKit, getReleases, getMembers } from '@/lib/sanity';
 import Hero from '@/components/Hero';
+import InstagramSection from '@/components/InstagramSection';
 import BackgroundSurface from '@/components/BackgroundSurface';
 import MediaSection from '@/components/MediaSection';
 import TourDates from '@/components/TourDates';
@@ -9,10 +10,16 @@ import MembersSection from '@/components/MembersSection';
 import ContactSection from '@/components/ContactSection';
 import { defaultContactEmail, siteUrl } from '@/lib/site';
 import { toHttpsUrl } from '@/lib/embeds';
+import { getInstagramFeed } from '@/lib/instagram';
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
-  const [pressKit, releases, members] = await Promise.all([getPressKit(), getReleases(), getMembers()]);
+  const [pressKit, releases, members, instagramFeed] = await Promise.all([
+    getPressKit(),
+    getReleases(),
+    getMembers(),
+    getInstagramFeed(),
+  ]);
 
   const bandName = settings?.bandName ?? 'End Of All Known';
 
@@ -57,7 +64,7 @@ export default async function HomePage() {
       )}
 
       <BackgroundSurface background={settings?.pageBackgrounds?.shows}>
-        <TourDates artistName={settings?.bandsintownArtistName ?? bandName} />
+        <TourDates artistName={settings?.bandsintownArtistName ?? bandName} bandsintownUrl={settings?.bandsintownUrl} />
       </BackgroundSurface>
 
       <BackgroundSurface background={settings?.pageBackgrounds?.bio}>
@@ -73,6 +80,17 @@ export default async function HomePage() {
       {members.length > 0 && (
         <BackgroundSurface background={settings?.pageBackgrounds?.band}>
           <MembersSection members={members} />
+        </BackgroundSurface>
+      )}
+
+      {instagramFeed.status !== 'unconfigured' && (
+        <BackgroundSurface background={settings?.pageBackgrounds?.instagram}>
+          <InstagramSection
+            feed={instagramFeed}
+            heading={settings?.instagramHeading}
+            followLabel={settings?.instagramFollowLabel}
+            profileUrl={settings?.socialLinks?.find((link) => link.platform === 'instagram')?.url}
+          />
         </BackgroundSurface>
       )}
 

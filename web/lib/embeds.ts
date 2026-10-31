@@ -2,6 +2,18 @@ const SPOTIFY_KINDS = new Set(['album', 'track', 'artist', 'playlist', 'show', '
 const YOUTUBE_HOSTS = new Set(['youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com', 'youtube-nocookie.com', 'www.youtube-nocookie.com']);
 const YOUTUBE_ID = /^[\w-]{6,}$/;
 
+export function getInstagramPostUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || !['instagram.com', 'www.instagram.com'].includes(url.hostname)) return null;
+    const match = /^\/(p|reel)\/([A-Za-z0-9_-]+)\/?$/.exec(url.pathname);
+    return match ? `https://www.instagram.com/${match[1]}/${match[2]}/` : null;
+  } catch {
+    return null;
+  }
+}
+
 export function getYouTubeVideoId(url: string): string {
   let parsed: URL;
   try {

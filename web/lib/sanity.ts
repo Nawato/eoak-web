@@ -36,10 +36,13 @@ function fetchContent<T>(query: string): Promise<T> {
 
 export interface SiteSettings {
   bandName: string;
+  instagramHeading?: string | null;
+  instagramFollowLabel?: string | null;
   socialLinks: SocialLink[];
   latestYoutubeUrl: string;
   featuredSpotifyUrl: string;
   bandsintownArtistName: string;
+  bandsintownUrl?: string | null;
   contactEmail?: string;
   streamingLinks?: LabeledLink[];
   merchUrl?: string;

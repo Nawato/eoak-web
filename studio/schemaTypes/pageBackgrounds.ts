@@ -6,6 +6,7 @@ const areas = [
   ['shows', 'Tour Dates'],
   ['bio', 'Bio / Press'],
   ['band', 'The Band'],
+  ['instagram', 'Instagram'],
   ['contact', 'Contact'],
   ['impressum', 'Impressum'],
   ['privacy', 'Privacy / Datenschutz'],
@@ -16,9 +17,15 @@ export default defineField({
   title: 'Page & Section Backgrounds',
   type: 'object',
   description: 'Optional independent backgrounds. The hero keeps its existing background settings.',
+  groups: [
+    { name: 'home', title: 'Home Page', default: true },
+    { name: 'impressum', title: 'Impressum' },
+    { name: 'privacy', title: 'Privacy / Datenschutz' },
+  ],
   fields: areas.map(([name, title]) => defineField({
     name,
     title,
+    group: name === 'impressum' || name === 'privacy' ? name : 'home',
     type: 'object',
     options: { collapsible: true, collapsed: true },
     fields: [
