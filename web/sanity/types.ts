@@ -1,4 +1,3 @@
-import type { LucideIcon } from 'lucide-react';
 import { Camera, Video, AtSign, Users, Music2 } from 'lucide-react';
 
 export const socialPlatforms = [
@@ -30,6 +29,7 @@ export interface PortableTextBlock {
   listItem?: 'bullet' | 'number' | string;
   level?: number;
   children?: PortableTextSpan[];
+  markDefs?: { _key: string; _type: string; href?: string }[];
 }
 
 export type PortableTextValue = PortableTextBlock[];
