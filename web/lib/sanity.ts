@@ -54,6 +54,6 @@ async function safeFetch<T>(label: string, query: string): Promise<T | null> {
 
 export const getSiteSettings = cache(() => safeFetch<SiteSettings>('site settings', `*[_id == "siteSettings"][0]`));
 
-export const getPressKit = cache(() => safeFetch<PressKit>('press kit', `*[_id == "pressKit"][0]`));
+export const getPressKit = cache(() => safeFetch<PressKit>('press kit', `*[_id == "pressKit"][0]{..., pressKitPdf{..., asset->{url}}}`));
 
 export const getImpressum = cache(() => safeFetch<Impressum>('impressum', `*[_id == "impressum"][0]`));
