@@ -118,4 +118,31 @@ describe('sendContactEmail', () => {
     expect((await sendContactEmail(contactForm())).success).toBe(false);
     expect(console.error).toHaveBeenCalled();
   });
+
+  it('limits submissions per client and allows them again after the window expires', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-10-31T12:00:00Z'));
+      headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': '192.0.2.10' }));
+      for (let index = 0; index < 3; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
+      expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
+      vi.advanceTimersByTime(10 * 60 * 1000);
+      expect((await sendContactEmail(contactForm())).success).toBe(true);
+    } finally { vi.useRealTimers(); }
+  });
+
+  it('bounds the number of retained clients even when every request uses a new address', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));
+      for (let index = 0; index < 1000; index++) {
+        headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': `client-${index}` }));
+        expect((await sendContactEmail(contactForm())).success).toBe(true);
+      }
+      headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': 'another-client' }));
+      expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
+      vi.advanceTimersByTime(10 * 60 * 1000);
+      expect((await sendContactEmail(contactForm())).success).toBe(true);
+    } finally { vi.useRealTimers(); }
+  });
 });

@@ -30,13 +30,13 @@ export default function BioSection({
           Bio
         </h2>
 
-        {biography ? (
+        {biography && biography.length > 0 ? (
           <PortableText value={biography} />
         ) : (
           <p className="text-lg text-muted">Biography coming soon.</p>
         )}
 
-        {pressRelease && (
+        {pressRelease && pressRelease.length > 0 && (
           <>
             <h3 className="mt-16 mb-6 font-display text-2xl font-semibold uppercase text-white">
               Press Release

@@ -4,9 +4,9 @@ import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getSiteSettings, getReleases, getMembers } from '@/lib/sanity';
+import { getSiteSettings, getNavigationContent } from '@/lib/sanity';
 import { getNavLinks } from '@/lib/nav';
-import { getInstagramFeed } from '@/lib/instagram';
+import { hasInstagramConfiguration } from '@/lib/instagram';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
@@ -57,16 +57,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const [settings, releases, members, instagramFeed] = await Promise.all([
+  const [settings, navigation] = await Promise.all([
     getSiteSettings(),
-    getReleases(),
-    getMembers(),
-    getInstagramFeed(),
+    getNavigationContent(),
   ]);
   const links = getNavLinks({
-    hasReleases: releases.length > 0,
-    hasMembers: members.length > 0,
-    hasInstagram: instagramFeed.status !== 'unconfigured',
+    ...navigation,
+    hasInstagram: hasInstagramConfiguration(),
     instagramHeading: settings?.instagramHeading,
   });
   const bandName = settings?.bandName ?? 'End Of All Known';

@@ -21,6 +21,9 @@
     "typescript": "^7.0.2"
   },
   "overrides": {
+    "@oclif/core": {
+      "minimatch": "^11.0.3"
+    },
     "rxjs": "^7.8.1",
     "js-yaml": "^3.15.2",
     "smol-toml": "^1.9.1",

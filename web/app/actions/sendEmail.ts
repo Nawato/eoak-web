@@ -10,6 +10,7 @@ const MAX_EMAIL = 254;
 const MAX_MESSAGE = 5000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_MAX_CLIENTS = 1000;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const recentSubmissions = new Map<string, number[]>();
 
@@ -25,6 +26,10 @@ function escapeHtml(value: string): string {
 // Best-effort per-instance limit; use a shared store (e.g. Upstash) for strict enforcement.
 function isRateLimited(key: string): boolean {
   const now = Date.now();
+  for (const [client, times] of recentSubmissions) {
+    if (times.every((time) => now - time >= RATE_LIMIT_WINDOW_MS)) recentSubmissions.delete(client);
+  }
+  if (!recentSubmissions.has(key) && recentSubmissions.size >= RATE_LIMIT_MAX_CLIENTS) return true;
   const recent = (recentSubmissions.get(key) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
   if (recent.length >= RATE_LIMIT_MAX) {
     recentSubmissions.set(key, recent);
@@ -32,11 +37,6 @@ function isRateLimited(key: string): boolean {
   }
   recent.push(now);
   recentSubmissions.set(key, recent);
-  if (recentSubmissions.size > 1000) {
-    for (const [k, times] of recentSubmissions) {
-      if (times.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) recentSubmissions.delete(k);
-    }
-  }
   return false;
 }
 

@@ -15,6 +15,10 @@ export interface InstagramFeed {
   posts: InstagramPost[];
 }
 
+export function hasInstagramConfiguration(): boolean {
+  return Boolean(process.env.INSTAGRAM_ACCESS_TOKEN?.trim() || process.env.INSTAGRAM_USER_ID?.trim());
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }

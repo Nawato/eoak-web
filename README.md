@@ -76,6 +76,8 @@ Unique-IP counting additionally requires an independent random `RELEASE_CLICK_HA
 
 Schedule a daily authenticated `POST /api/release-clicks/cleanup` with `Authorization: Bearer <RELEASE_CLICK_CLEANUP_SECRET>`. It deletes `clickHash` documents older than 48 hours (48–72-hour retention with a daily job). **Deletion is not automatic until that job is configured**; monitor failures. Rotate hash secrets if compromised; doing so resets deduplication for the current day. In-process safeguards cap writes at 20 per IP per minute and 300 globally per minute per server process, not across instances. Add an edge/WAF rate limit on `/go/*` in production to bound abuse, document growth and Sanity costs.
 
+Redirects resolve the published destination first and schedule analytics through Next.js `after`, so Sanity mutation latency does not delay opening the streaming service. Deploy on a host that supports post-response work (`waitUntil` or an equivalent lifecycle); do not replace this with an unawaited promise. Sanity-backed analytics is intended for this low-volume band site, not a high-traffic analytics pipeline.
+
 Exclude analytics types from the Sanity revalidation webhook with `_type in ["siteSettings", "pressKit", "impressum", "release", "member"]` so counting/cleanup does not refresh the content cache. Deploy both Studio and web to pick up the separate statistics display.
 
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
@@ -102,7 +104,7 @@ npm run deploy-schema   # schema only
 
 Publish your edits in Studio to make them visible on the website; uploading an image only saves a draft until you publish. Refresh the local website after publishing. Local development bypasses the content cache and Sanity CDN so published edits appear on refresh.
 
-In production, content is cached for 60 seconds. For faster updates, create a webhook in Sanity (manage.sanity.io → API → Webhooks):
+In production, content is cached for 60 seconds. Navigation uses existence-only queries rather than loading release/member lists; Instagram is fetched only by the home page, not by the shared layout or legal pages. For faster updates, create a webhook in Sanity (manage.sanity.io → API → Webhooks):
 
 - URL: `https://<your-domain>/api/revalidate`
 - Method POST, with a secret equal to `SANITY_REVALIDATE_SECRET`
@@ -150,6 +152,12 @@ npm test         # Vitest
 ```
 
 Before pushing, run `npm run lint`, `npx tsc --noEmit`, `npm test` and `npm run build` in `web/`, and `npx tsc --noEmit` plus `npx sanity schema validate` in `studio/`. Dependabot (`.github/dependabot.yml`) opens weekly grouped dependency updates.
+
+Both applications override `@oclif/core`'s `minimatch` dependency to v11.0.3+ for [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249). The CLI uses the retained `minimatch()` API; the override is scoped to that dependency and does not upgrade unrelated glob consumers. Remove it once the upstream CLI depends on a patched version.
+
+The web development-only ESLint dependency tree still reports the same advisory for older `minimatch` versions. Do not globally force v11: older consumers use APIs removed in that major. Keep lint tooling away from untrusted glob inputs and revisit compatible upstream fixes; the production dependency audits are separate (`npm audit --omit=dev`).
+
+`studio/.sanity/` contains generated local runtime files and is intentionally ignored; Sanity recreates them when needed.
 
 ## Deployment
 

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
-import { getInstagramFeed } from './instagram';
+import { getInstagramFeed, hasInstagramConfiguration } from './instagram';
 
 function media(index: number, overrides = {}) {
   return {
@@ -69,6 +69,15 @@ describe('Instagram feed API', () => {
     vi.stubEnv('INSTAGRAM_ACCESS_TOKEN', '');
     vi.stubEnv('INSTAGRAM_USER_ID', '');
     expect(await getInstagramFeed()).toEqual({ status: 'unconfigured', posts: [] });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('checks navigation visibility without fetching the feed or hiding configuration errors', () => {
+    expect(hasInstagramConfiguration()).toBe(true);
+    vi.stubEnv('INSTAGRAM_ACCESS_TOKEN', '');
+    expect(hasInstagramConfiguration()).toBe(true);
+    vi.stubEnv('INSTAGRAM_USER_ID', ' ');
+    expect(hasInstagramConfiguration()).toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

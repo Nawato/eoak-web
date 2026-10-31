@@ -1,5 +1,6 @@
 node_modules/
 .next/
+studio/.sanity/
 out/
 build/
 dist/

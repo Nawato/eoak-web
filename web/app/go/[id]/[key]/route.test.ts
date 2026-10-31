@@ -5,12 +5,18 @@ const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
   createClient: vi.fn(),
   commit: vi.fn(),
+  after: vi.fn(),
+  tasks: [] as (() => Promise<void>)[],
   transactions: [] as {
     stats?: { _id: string; clicks: number; uniqueClicks: number };
     hash?: { _id: string; day: string };
     patchId?: string;
     increments?: Record<string, number>;
   }[],
+}));
+vi.mock('next/server', async (importOriginal) => ({
+  ...await importOriginal<typeof import('next/server')>(),
+  after: mocks.after,
 }));
 vi.mock('next-sanity', () => ({ createClient: mocks.createClient }));
 
@@ -20,6 +26,8 @@ beforeEach(async () => {
   vi.resetModules();
   vi.clearAllMocks();
   mocks.transactions.length = 0;
+  mocks.tasks.length = 0;
+  mocks.after.mockImplementation((task: () => Promise<void>) => { mocks.tasks.push(task); });
   vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
   vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');
   vi.stubEnv('SANITY_API_WRITE_TOKEN', 'test-write-token');
@@ -46,7 +54,15 @@ beforeEach(async () => {
     },
   });
   vi.spyOn(console, 'error').mockImplementation(() => {});
-  route = await import('./route');
+  const actual = await import('./route');
+  route = {
+    ...actual,
+    GET: async (...args) => {
+      const response = await actual.GET(...args);
+      await Promise.all(mocks.tasks.splice(0).map((task) => task()));
+      return response;
+    },
+  };
 });
 
 afterEach(() => {
@@ -62,6 +78,15 @@ function request(extra: Record<string, string> = {}) {
 const context = (id = 'release', key = 'link') => ({ params: Promise.resolve({ id, key }) });
 
 describe('release click redirects', () => {
+  it('returns the redirect before performing analytics writes', async () => {
+    const actual = await import('./route');
+    const response = await actual.GET(request(), context());
+    expect(response.status).toBe(302);
+    expect(mocks.commit).not.toHaveBeenCalled();
+    expect(mocks.tasks).toHaveLength(1);
+    await mocks.tasks[0]();
+    expect(mocks.commit).toHaveBeenCalledOnce();
+  });
   it('counts in a separate statistics singleton, preserving legacy totals', async () => {
     mocks.fetch.mockResolvedValue({ url: 'https://music.example/release', clicks: 7, uniqueClicks: 3 });
     const response = await route.GET(request(), context());

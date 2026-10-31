@@ -34,9 +34,9 @@ const components: PortableTextComponents = {
     strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
     em: ({ children }) => <em className="italic">{children}</em>,
     link: ({ children, value }) => {
-      const href = (value as { href?: string } | undefined)?.href;
+      const href = typeof value?.href === 'string' ? value.href : undefined;
       if (!isSafeHref(href)) return <>{children}</>;
-      const external = /^https?:/i.test(href);
+      const external = /^(https?:|\/\/|\/\\)/i.test(href);
       return (
         <a
           href={href}
@@ -55,7 +55,7 @@ export default function PortableText({ value }: PortableTextProps) {
 
   return (
     <div>
-      <BasePortableText value={value as never} components={components} />
+      <BasePortableText value={value} components={components} />
     </div>
   );
 }

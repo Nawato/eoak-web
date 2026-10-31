@@ -15,6 +15,17 @@ afterEach(() => {
 });
 
 describe('Sanity content freshness', () => {
+  it('fetches only existence flags for navigation instead of full content lists', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
+    vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');
+    const { getNavigationContent } = await import('./sanity');
+    await getNavigationContent();
+    expect(fetch).toHaveBeenCalledOnce();
+    const query = fetch.mock.calls[0][0];
+    expect(query).toContain('"hasReleases": defined(*[_type == "release"][0]._id)');
+    expect(query).toContain('"hasMembers": defined(*[_type == "member"][0]._id)');
+    expect(query).not.toContain('cover');
+  });
   it('uses a parameterized single-release query and an uncapped slug query', async () => {
     vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
     vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');

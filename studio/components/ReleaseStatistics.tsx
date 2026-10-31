@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useClient, useFormValue } from 'sanity';
 
 type Link = { _key: string; label?: string; clicks?: number; uniqueClicks?: number };
 type Stats = { linkKey: string; clicks: number; uniqueClicks: number };
 
 export default function ReleaseStatistics() {
-  const client = useClient({ apiVersion: '2024-01-01' });
+  const sourceClient = useClient({ apiVersion: '2024-01-01' });
+  const client = useMemo(() => sourceClient.withConfig({ useCdn: false }), [sourceClient]);
   const documentId = useFormValue(['_id']);
   const links = useFormValue(['links']) as Link[] | undefined;
   const [stats, setStats] = useState<Stats[]>([]);

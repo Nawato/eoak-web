@@ -120,6 +120,15 @@ const MEMBERS_QUERY = defineQuery(
   `*[_type == "member" && !(_id in path("drafts.**"))] | order(order asc, name asc)[0...30]{ _id, name, role, photo }`,
 );
 
+const NAVIGATION_QUERY = defineQuery(`{
+  "hasReleases": defined(*[_type == "release"][0]._id),
+  "hasMembers": defined(*[_type == "member"][0]._id)
+}`);
+
+export const getNavigationContent = cache(() =>
+  fetchContent<{ hasReleases: boolean; hasMembers: boolean }>(NAVIGATION_QUERY),
+);
+
 export const getSiteSettings = cache(() => fetchContent<SiteSettings | null>(SITE_SETTINGS_QUERY));
 
 export const getPressKit = cache(() => fetchContent<PressKit | null>(PRESS_KIT_QUERY));

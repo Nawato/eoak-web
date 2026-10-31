@@ -39,7 +39,7 @@ export interface PortableTextSpan {
 
 export interface PortableTextBlock {
   _key?: string;
-  _type?: string;
+  _type: 'block';
   style?: string;
   listItem?: 'bullet' | 'number' | string;
   level?: number;

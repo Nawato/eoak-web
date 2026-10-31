@@ -1,6 +1,6 @@
 import { createHash, createHmac } from 'node:crypto';
 import { isIP } from 'node:net';
-import { NextResponse, type NextRequest } from 'next/server';
+import { after, NextResponse, type NextRequest } from 'next/server';
 import { createClient } from 'next-sanity';
 import { toHttpsUrl } from '@/lib/embeds';
 
@@ -79,26 +79,27 @@ async function redirect(request: NextRequest, { params }: Params, count: boolean
           _id: statsId, _type: 'releaseLinkStats', releaseId: id, linkKey: key,
           clicks: link.clicks ?? 0, uniqueClicks: link.uniqueClicks ?? 0,
         };
-        try {
-          const transaction = () => client.transaction().createIfNotExists(stats);
-          if (visitor) {
-            const hashId = `clickHash.${createHash('sha256').update(`${digest}.${visitor}`).digest('hex')}`;
-            try {
-              await transaction()
-                .create({ _id: hashId, _type: 'clickHash', day })
-                .patch(statsId, (patch) => patch.inc({ clicks: 1, uniqueClicks: 1 }))
-                .commit({ visibility: 'sync' });
-            } catch (error) {
-              if (!(typeof error === 'object' && error !== null && 'statusCode' in error && error.statusCode === 409)) throw error;
+        after(async () => {
+          try {
+            const transaction = () => client.transaction().createIfNotExists(stats);
+            if (visitor) {
+              const hashId = `clickHash.${createHash('sha256').update(`${digest}.${visitor}`).digest('hex')}`;
+              try {
+                await transaction()
+                  .create({ _id: hashId, _type: 'clickHash', day })
+                  .patch(statsId, (patch) => patch.inc({ clicks: 1, uniqueClicks: 1 }))
+                  .commit({ visibility: 'sync' });
+              } catch (error) {
+                if (!(typeof error === 'object' && error !== null && 'statusCode' in error && error.statusCode === 409)) throw error;
+                await transaction().patch(statsId, (patch) => patch.inc({ clicks: 1 })).commit({ visibility: 'sync' });
+              }
+            } else {
               await transaction().patch(statsId, (patch) => patch.inc({ clicks: 1 })).commit({ visibility: 'sync' });
             }
-          } else {
-            await transaction().patch(statsId, (patch) => patch.inc({ clicks: 1 })).commit({ visibility: 'sync' });
+          } catch {
+            console.error('Counting release click failed.');
           }
-        } catch {
-          // Analytics must not prevent a visitor reaching the release.
-          console.error('Counting release click failed.');
-        }
+        });
       }
     }
   }

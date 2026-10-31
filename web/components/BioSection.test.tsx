@@ -7,6 +7,11 @@ const driveUrl = 'https://drive.google.com/drive/folders/example';
 const pdfUrl = 'https://cdn.sanity.io/files/example/production/press-kit.pdf';
 
 describe('press kit link', () => {
+  it('shows the biography placeholder and no empty press heading for empty rich text', () => {
+    const html = renderToStaticMarkup(createElement(BioSection, { biography: [], pressRelease: [] }));
+    expect(html).toContain('Biography coming soon.');
+    expect(html).not.toContain('Press Release');
+  });
   it('prefers the external folder and uses the editable label', () => {
     const html = renderToStaticMarkup(createElement(BioSection, {
       pressKitUrl: driveUrl,
