@@ -67,6 +67,21 @@ export default async function DatenschutzPage() {
               <a href="https://www.sanity.io/legal/privacy">Sanity-Datenschutzhinweise</a>. Schriftarten werden von
               unserer Website ausgeliefert; es erfolgt hierfür kein Abruf von Google Fonts durch Ihren Browser.
             </p>
+            <h3>Klickstatistik für Release-Links</h3>
+            <p>
+              Beim Folgen eines Release-Links zählen wir den Aufruf serverseitig in Sanity. Sofern die
+              IP-basierte Auswertung aktiviert ist, bilden wir aus der vom vertrauenswürdigen Proxy gelieferten
+              IP-Adresse und dem UTC-Kalendertag einen geheimnisgeschützten Hash zur täglichen Deduplizierung.
+              Die IP-Adresse selbst und Browserinformationen werden dabei nicht in Sanity gespeichert.
+              Bekannte Bots und Vorladeaufrufe werden soweit erkennbar nicht gezählt. Es werden hierfür keine
+              Cookies gesetzt und keine Daten im Browser gespeichert.
+            </p>
+            <p>
+              Die pseudonymen Deduplizierungsdaten werden bei aktivierter täglicher Bereinigung nach 48 bis
+              72 Stunden gelöscht; zusammengefasste Zähler bleiben erhalten. Die Statistik ist nur eine
+              Näherung und erkennt keine einzelnen Personen. Rechtsgrundlage und Interessenabwägung sowie
+              die tatsächliche Bereinigung und Sanity-Verarbeitung sind vor Aktivierung vom Betreiber zu prüfen.
+            </p>
           </section>
 
           <section>

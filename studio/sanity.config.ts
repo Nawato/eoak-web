@@ -15,11 +15,14 @@ export default defineConfig({
   plugins: [structureTool({ structure }), visionTool()],
   schema: {
     types: schemaTypes,
+    templates: (templates) => templates.filter(({ schemaType }) => !['releaseLinkStats', 'clickHash'].includes(schemaType)),
   },
   document: {
     // Singletons can only be edited, never created or duplicated.
     actions: (input, context) =>
-      (singletonTypes as readonly string[]).includes(context.schemaType)
+      ['releaseLinkStats', 'clickHash'].includes(context.schemaType)
+        ? []
+        : (singletonTypes as readonly string[]).includes(context.schemaType)
         ? input.filter(({ action }) => action && !['duplicate', 'delete', 'unpublish'].includes(action))
         : input,
     newDocumentOptions: (prev, { creationContext }) =>

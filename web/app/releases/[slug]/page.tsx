@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getReleases, getSiteSettings } from '@/lib/sanity';
+import { connection } from 'next/server';
+import { getRelease, getSiteSettings } from '@/lib/sanity';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { getHttpsLinks } from '@/lib/embeds';
 import { formatRelativeDate, isUpcoming } from '@/lib/releases';
@@ -10,14 +11,9 @@ import BackgroundSurface from '@/components/BackgroundSurface';
 
 type Props = { params: Promise<{ slug: string }> };
 
-async function findRelease(slug: string) {
-  const releases = await getReleases();
-  return releases.find((release) => release.slug === slug);
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const release = await findRelease(slug);
+  const release = await getRelease(slug);
   if (!release) return {};
   return {
     title: release.title,
@@ -27,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ReleasePage({ params }: Props) {
+  await connection();
   const { slug } = await params;
-  const [release, settings] = await Promise.all([findRelease(slug), getSiteSettings()]);
+  const [release, settings] = await Promise.all([getRelease(slug), getSiteSettings()]);
   if (!release) notFound();
 
   const now = new Date();
@@ -68,6 +65,9 @@ export default async function ReleasePage({ params }: Props) {
               {[release.releaseType, formatRelativeDate(release.releaseDate, now)].filter(Boolean).join(' · ')}
             </p>
             <h1 className="mt-2 font-display text-4xl font-bold uppercase text-white">{release.title}</h1>
+            <time dateTime={release.releaseDate} className="mt-2 block text-sm text-zinc-400">
+              {release.releaseDate}
+            </time>
             {release.teaser && <p className="mt-6 whitespace-pre-line text-zinc-300">{release.teaser}</p>}
             {links.length > 0 && (
               <div className="mt-8 flex flex-wrap gap-2">

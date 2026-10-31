@@ -28,10 +28,10 @@ const REVALIDATE_SECONDS = 60;
 export const SANITY_CACHE_TAG = 'sanity';
 
 // Errors propagate on purpose: a failed fetch must not be cached as "no content".
-function fetchContent<T>(query: string): Promise<T> {
+function fetchContent<T>(query: string, params: Record<string, string> = {}): Promise<T> {
   return sanityClient.fetch<T>(
     query,
-    {},
+    params,
     isDevelopment
       ? { cache: 'no-store' }
       : { next: { revalidate: REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] } },
@@ -106,9 +106,16 @@ const IMPRESSUM_QUERY = defineQuery(`*[_id == "impressum"][0]{
 }`);
 
 const RELEASES_QUERY = defineQuery(
-  `*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]{ _id, title, "slug": slug.current, teaser, releaseType, releaseDate, cover, "links": coalesce(links, []) }`,
+  `*[_type == "release" && !(_id in path("drafts.**"))] | order(releaseDate desc)[0...50]{ _id, title, "slug": slug.current, teaser, releaseType, releaseDate, cover, "links": coalesce(links[]{_key, label, url}, []) }`,
 );
 
+const RELEASE_QUERY = defineQuery(
+  `*[_type == "release" && slug.current == $slug][0]{ _id, title, "slug": slug.current, teaser, releaseType, releaseDate, cover, "links": coalesce(links[]{_key, label, url}, []) }`,
+);
+
+const RELEASE_SLUGS_QUERY = defineQuery(
+  `*[_type == "release" && defined(slug.current)]{"slug": slug.current}`,
+);
 const MEMBERS_QUERY = defineQuery(
   `*[_type == "member" && !(_id in path("drafts.**"))] | order(order asc, name asc)[0...30]{ _id, name, role, photo }`,
 );
@@ -138,5 +145,9 @@ export interface Member {
 }
 
 export const getReleases = cache(() => fetchContent<Release[]>(RELEASES_QUERY));
+
+export const getRelease = cache((slug: string) => fetchContent<Release | null>(RELEASE_QUERY, { slug }));
+
+export const getReleaseSlugs = cache(() => fetchContent<{ slug: string }[]>(RELEASE_SLUGS_QUERY));
 
 export const getMembers = cache(() => fetchContent<Member[]>(MEMBERS_QUERY));

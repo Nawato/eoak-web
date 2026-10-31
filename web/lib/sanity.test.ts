@@ -15,6 +15,16 @@ afterEach(() => {
 });
 
 describe('Sanity content freshness', () => {
+  it('uses a parameterized single-release query and an uncapped slug query', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
+    vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');
+    const { getRelease, getReleaseSlugs } = await import('./sanity');
+    await getRelease('older-release');
+    await getReleaseSlugs();
+    expect(fetch.mock.calls[0][0]).toContain('slug.current == $slug');
+    expect(fetch.mock.calls[0][1]).toEqual({ slug: 'older-release' });
+    expect(fetch.mock.calls[1][0]).not.toContain('[0...50]');
+  });
   it.each(['development', 'production'])('uses appropriate caching in %s', async (environment) => {
     vi.stubEnv('NODE_ENV', environment);
     vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');

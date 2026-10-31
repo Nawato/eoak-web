@@ -3,5 +3,6 @@ import pressKit from './pressKit';
 import impressum from './impressum';
 import release from './release';
 import member from './member';
+import { releaseAnalyticsTypes } from './releaseAnalytics';
 
-export const schemaTypes = [siteSettings, pressKit, impressum, release, member];
+export const schemaTypes = [siteSettings, pressKit, impressum, release, member, ...releaseAnalyticsTypes];

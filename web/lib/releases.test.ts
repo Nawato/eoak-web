@@ -20,6 +20,16 @@ describe('releases', () => {
     expect(splitReleases([r('a', '2026-11-01')], lateUtc).released).toHaveLength(1);
   });
 
+  it('uses Berlin summer time and handles DST without fractional days', () => {
+    expect(formatRelativeDate('2026-07-01', new Date('2026-06-30T22:30:00Z'))).toBe('today');
+    expect(formatRelativeDate('2026-10-26', new Date('2026-10-24T22:30:00Z'))).toBe('tomorrow');
+  });
+
+  it.each(['not-a-date', '2026-02-30', '2026-10-31T23:00:00Z', '2026-1-01'])('rejects invalid date-only values: %s', (date) => {
+    expect(formatRelativeDate(date, now)).toBe('');
+    expect(splitReleases([r('bad', date)], now)).toEqual({ upcoming: [], released: [] });
+  });
+
   it('formats relative dates', () => {
     expect(formatRelativeDate('2026-10-31', now)).toBe('today');
     expect(formatRelativeDate('2026-11-01', now)).toBe('tomorrow');

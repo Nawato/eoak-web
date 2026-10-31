@@ -1,4 +1,5 @@
 import { getSiteSettings, getPressKit, getReleases, getMembers } from '@/lib/sanity';
+import { connection } from 'next/server';
 import Hero from '@/components/Hero';
 import InstagramSection from '@/components/InstagramSection';
 import BackgroundSurface from '@/components/BackgroundSurface';
@@ -13,6 +14,7 @@ import { toHttpsUrl } from '@/lib/embeds';
 import { getInstagramFeed } from '@/lib/instagram';
 
 export default async function HomePage() {
+  await connection();
   const settings = await getSiteSettings();
   const [pressKit, releases, members, instagramFeed] = await Promise.all([
     getPressKit(),
