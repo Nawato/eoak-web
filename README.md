@@ -137,7 +137,7 @@ npm run lint     # ESLint
 npm test         # Vitest
 ```
 
-GitHub Actions (`.github/workflows/ci.yml`) runs lint, type checks, tests and the production build for `web/`, and type checks plus schema validation for `studio/`, on every push to `main` and every pull request. Dependabot (`.github/dependabot.yml`) opens weekly grouped dependency updates.
+Before pushing, run `npm run lint`, `npx tsc --noEmit`, `npm test` and `npm run build` in `web/`, and `npx tsc --noEmit` plus `npx sanity schema validate` in `studio/`. Dependabot (`.github/dependabot.yml`) opens weekly grouped dependency updates.
 
 ## Deployment
 
