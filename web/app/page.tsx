@@ -32,7 +32,9 @@ export default async function HomePage() {
 
       <GallerySection
         gallery={
-          (pressKit?.gallery ?? []).map((item) => ({
+          (pressKit?.gallery ?? [])
+            .filter((item) => (item.image as { asset?: unknown } | null | undefined)?.asset)
+            .map((item) => ({
             ...item,
             image: item.image as SanityImageSource,
           }))

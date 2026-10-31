@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
-import { builder } from '@/lib/sanity-image';
+import { getImageUrl } from '@/lib/sanity-image';
 import type { SanityImageSource } from '@/lib/sanity-image';
 import Lightbox from '@/components/Lightbox';
 
@@ -14,11 +14,6 @@ export interface GalleryImage {
 
 interface GallerySectionProps {
   gallery?: GalleryImage[];
-}
-
-function getImageUrl(image: SanityImageSource, width: number, height: number): string | undefined {
-  const url = builder.image(image).width(width).height(height).url();
-  return url ?? undefined;
 }
 
 export default function GallerySection({ gallery = [] }: GallerySectionProps) {

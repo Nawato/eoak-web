@@ -10,3 +10,13 @@ if (!projectId || !dataset) {
 export const builder = createImageUrlBuilder({ projectId, dataset });
 
 export type SanityImageSource = Parameters<typeof builder.image>[0];
+
+export function getImageUrl(image: SanityImageSource, width: number, height?: number): string | undefined {
+  try {
+    let b = builder.image(image).width(width);
+    if (height) b = b.height(height);
+    return b.url() ?? undefined;
+  } catch {
+    return undefined;
+  }
+}

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
-import { builder } from '@/lib/sanity-image';
+import { getImageUrl } from '@/lib/sanity-image';
 import type { SanityImageSource } from '@/lib/sanity-image';
 
 interface LightboxProps {
@@ -45,7 +45,7 @@ export default function Lightbox({ image, caption, onClose }: LightboxProps) {
 
   if (!image) return null;
 
-  const imageUrl = builder.image(image).width(1600).url();
+  const imageUrl = getImageUrl(image, 1600);
   const label = caption ? `Image: ${caption}` : 'Gallery image';
 
   return (
