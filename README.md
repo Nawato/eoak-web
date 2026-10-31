@@ -58,7 +58,7 @@ The Studio has three single documents plus two lists (**Releases** and **Band Me
 
 - **Site Settings** – band name, logo, hero background photo (with hotspot and alt text), hero text, share image, favicon, social links, YouTube and Spotify URLs, streaming and merch links, Bandsintown name, contact email
 - **Press Kit** – biography, press release, complete press kit link (e.g. Google Drive), editable button label, optional fallback PDF
-- **Impressum** – legal details
+- **Impressum & Datenschutz** (same existing document) – operator identity, conditional legal disclosures and deployment-specific privacy details
 
 Until a logo or photo is uploaded, the site shows the band name and a gradient background.
 
@@ -112,6 +112,20 @@ The section and navigation link are hidden until credentials are configured. Inv
 All inquiries go to the single **Contact Email** in Sanity Site Settings, defaulting to `kontakt@endofallknown.de` if that field is not yet set. Legacy booking/management fields and recipient environment variables are no longer used.
 
 Visitors must enter their own valid email address. It is included in the message and used as **Reply-To**, so replying reaches the visitor. The **From** address stays on your Resend-verified domain to avoid spoofing visitors' addresses and failing email authentication.
+
+## Legal pages: required setup before launch
+
+The German legal pages describe the implemented data flows; they are not a legal certification. In **Impressum & Datenschutz**, complete and publish the **Verantwortlicher**, **Impressum** and **Datenschutz** tabs. Existing operator data remains in the same document. Old TMG wording is no longer rendered; the imprint uses § 5 DDG. No sample address, telephone number or legal representative is prefilled for new documents.
+
+Provide the actual legally responsible person/entity and service address, email and means of direct contact; add legal form, representatives, register, VAT/business ID and editorial responsibility only where applicable. Review § 36 VSBG applicability and the actual dispute-resolution statement. Do not publish a private tax number or link to the discontinued EU ODR platform.
+
+Privacy setup requires the actual host's name/address, processing locations and log retention; mailbox/Resend provider details and message/log deletion periods; actual third-country recipients and Art. 45/46 safeguards with access to copies; and the competent supervisory authority. Add DPO details if appointed. Unknown details remain explicitly marked as missing on the public page instead of being invented. Sanity validation requires the core privacy fields before publishing.
+
+Before production, verify these disclosures against your host, proxy logs, provider contracts and account retention settings, conclude necessary Art. 28 processing agreements, and verify any third-country transfer basis (do not assume DPF certification). New tracking/services require a new assessment. Obtain a qualified German/EU legal review for your actual business and deployment; filling these fields alone does not establish compliance.
+
+Visitors can revoke all four media-provider choices on `/datenschutz`, in addition to the controls on each media block. Consent preferences currently have no automatic expiry; the notice explicitly describes this. Browser tests should confirm no provider requests before opt-in and withdrawal on your deployed site.
+
+References: [§ 5 DDG](https://www.gesetze-im-internet.de/ddg/__5.html), [§ 25 TDDDG](https://www.gesetze-im-internet.de/ttdsg/__25.html), [GDPR, especially Arts. 13, 21, 28 and 44–49](https://eur-lex.europa.eu/eli/reg/2016/679/oj), [§ 36 VSBG](https://www.gesetze-im-internet.de/vsbg/__36.html).
 
 ## Scripts (in `web/`)
 

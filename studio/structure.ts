@@ -8,7 +8,8 @@ export const structure: StructureResolver = (S) =>
     .title('Content')
     .items([
       ...singletonTypes.map((type) => {
-        const title = type === 'siteSettings' ? 'Site Settings' : type === 'pressKit' ? 'Press Kit' : 'Impressum';
+        const title =
+          type === 'siteSettings' ? 'Site Settings' : type === 'pressKit' ? 'Press Kit' : 'Impressum & Datenschutz';
         return S.listItem().title(title).id(type).child(S.document().schemaType(type).documentId(type));
       }),
       S.divider(),

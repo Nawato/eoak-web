@@ -67,6 +67,19 @@ export interface Impressum {
   email: string;
   phone: string;
   representedBy: string;
+  legalForm?: string | null;
+  registerDetails?: string | null;
+  vatId?: string | null;
+  businessId?: string | null;
+  editorialResponsible?: string | null;
+  disputeResolution?: string | null;
+  additionalLegalDetails?: string | null;
+  hostingDetails?: string | null;
+  emailProcessingDetails?: string | null;
+  internationalTransfers?: string | null;
+  supervisoryAuthority?: string | null;
+  dataProtectionOfficer?: string | null;
+  additionalPrivacyDetails?: string | null;
 }
 
 export const getSiteSettings = cache(() => fetchContent<SiteSettings | null>(`*[_id == "siteSettings"][0]`));
