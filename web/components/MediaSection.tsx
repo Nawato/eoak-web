@@ -1,37 +1,9 @@
+import ConsentEmbed from '@/components/ConsentEmbed';
+import { getSpotifyEmbedUrl, getYouTubeVideoId } from '@/lib/embeds';
+
 interface MediaSectionProps {
   latestYoutubeUrl: string;
   featuredSpotifyUrl: string;
-}
-
-function getYouTubeVideoId(url: string): string {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=)([\w-]{6,})/,
-    /(?:youtu\.be\/)([\w-]{6,})/,
-    /(?:youtube\.com\/embed\/)([\w-]{6,})/,
-  ];
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) return match[1];
-  }
-  return '';
-}
-
-const SPOTIFY_KINDS = new Set(['album', 'track', 'artist', 'playlist', 'show', 'episode']);
-
-function getSpotifyEmbedUrl(url: string): string {
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return '';
-  }
-  if (parsed.hostname !== 'open.spotify.com') return '';
-
-  // Drop optional locale prefix such as /intl-de/
-  const segments = parsed.pathname.split('/').filter(Boolean).filter((s) => !s.startsWith('intl-'));
-  const [kind, id] = segments;
-  if (!kind || !id || !SPOTIFY_KINDS.has(kind) || !/^[A-Za-z0-9]+$/.test(id)) return '';
-  return `https://open.spotify.com/embed/${kind}/${id}`;
 }
 
 export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl }: MediaSectionProps) {
@@ -49,13 +21,21 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl }: M
           {/* YouTube Player */}
           <div className="relative aspect-video w-full overflow-hidden rounded-sm border border-white/10 bg-black">
             {videoId ? (
-              <iframe
-                className="absolute inset-0 h-full w-full"
-                src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
-                title="Latest release video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <ConsentEmbed
+                provider="YouTube"
+                description="This video is hosted by YouTube."
+                className="absolute inset-0 h-full w-full overflow-auto"
+              >
+                <iframe
+                  className="h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0`}
+                  title="Latest release video"
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </ConsentEmbed>
             ) : (
               <div className="flex h-full w-full items-center justify-center p-6 text-center text-sm text-muted">
                 No latest release video configured in Sanity yet.
@@ -69,12 +49,20 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl }: M
               Featured Release
             </h3>
             {spotifyEmbedUrl ? (
-              <iframe
-                className="h-[400px] w-full rounded-sm border border-white/10"
-                src={spotifyEmbedUrl}
-                title="Spotify featured release"
-                allow="encrypted-media"
-              />
+              <ConsentEmbed
+                provider="Spotify"
+                description="This player is provided by Spotify."
+                className="rounded-sm border border-white/10"
+              >
+                <iframe
+                  className="h-[400px] w-full"
+                  src={spotifyEmbedUrl}
+                  title="Spotify featured release"
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="encrypted-media"
+                />
+              </ConsentEmbed>
             ) : (
               <p className="text-center text-sm text-muted">No Spotify release configured yet.</p>
             )}

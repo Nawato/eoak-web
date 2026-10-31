@@ -1,6 +1,5 @@
-'use client';
-
 import Script from 'next/script';
+import ConsentEmbed from '@/components/ConsentEmbed';
 
 interface TourDatesProps {
   artistName: string;
@@ -14,9 +13,12 @@ export default function TourDates({ artistName }: TourDatesProps) {
           Tour Dates
         </h2>
 
-        {/* Bandsintown Tour Dates Widget */}
-        <Script src="https://widget.bandsintown.com/main.min.js" strategy="afterInteractive" />
-        <div className="mx-auto max-w-xl rounded-sm border border-white/10 bg-zinc-800 p-6">
+        <ConsentEmbed
+          provider="Bandsintown"
+          description="Tour dates are provided by Bandsintown."
+          className="mx-auto max-w-xl rounded-sm border border-white/10 bg-zinc-800 p-6"
+        >
+          <Script src="https://widget.bandsintown.com/main.min.js" strategy="afterInteractive" />
           <a
             className="bit-widget-initializer"
             data-artist-name={artistName}
@@ -31,20 +33,7 @@ export default function TourDates({ artistName }: TourDatesProps) {
             data-separator-color="rgba(255,255,255,0.1)"
             data-popup-background-color="#18181b"
           />
-        </div>
-
-        <p className="mt-8 text-center text-sm text-muted">
-          See all upcoming shows via Bandsintown for{' '}
-          <a
-            href={`https://www.bandsintown.com/${encodeURIComponent(artistName)}?utm_source=eoak-web`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:text-accent-dark"
-          >
-            {artistName}
-          </a>
-          .
-        </p>
+        </ConsentEmbed>
       </div>
     </section>
   );

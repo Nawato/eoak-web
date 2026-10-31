@@ -1,5 +1,8 @@
 import Link from 'next/link';
 import { Camera, Video, AtSign, Users, Music2, type LucideIcon } from 'lucide-react';
+import MobileNav from '@/components/MobileNav';
+import { navLinks } from '@/lib/nav';
+import { toHttpsUrl } from '@/lib/embeds';
 import type { SocialLink } from '@/sanity/types';
 
 const platformIcons: Record<string, LucideIcon> = {
@@ -9,14 +12,6 @@ const platformIcons: Record<string, LucideIcon> = {
   facebook: Users,
   tiktok: Music2,
 };
-
-const navLinks = [
-  { href: '/#music', label: 'Music' },
-  { href: '/#shows', label: 'Shows' },
-  { href: '/#bio', label: 'Bio' },
-  { href: '/#gallery', label: 'Gallery' },
-  { href: '/#contact', label: 'Contact' },
-];
 
 interface NavbarProps {
   bandName: string;
@@ -31,7 +26,7 @@ export default function Navbar({ bandName, socialLinks = [] }: NavbarProps) {
           {bandName}
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -44,13 +39,14 @@ export default function Navbar({ bandName, socialLinks = [] }: NavbarProps) {
         </nav>
 
         <div className="flex items-center gap-3">
-          {socialLinks.map((link) => {
+          {socialLinks.map((link, index) => {
             const Icon = platformIcons[link.platform];
-            if (!Icon) return null;
+            const href = toHttpsUrl(link.url);
+            if (!Icon || !href) return null;
             return (
               <a
-                key={link.platform}
-                href={link.url}
+                key={`${link.platform}-${index}`}
+                href={href}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={link.platform}
@@ -60,6 +56,7 @@ export default function Navbar({ bandName, socialLinks = [] }: NavbarProps) {
               </a>
             );
           })}
+          <MobileNav links={navLinks} />
         </div>
       </div>
     </header>

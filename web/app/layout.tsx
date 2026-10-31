@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteSettings } from '@/lib/sanity';
+import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -18,12 +19,25 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: 'End Of All Known',
-    template: '%s | End Of All Known',
+    default: siteName,
+    template: `%s | ${siteName}`,
   },
-  description:
-    'Official website of End Of All Known – dark, atmospheric metalcore. Music, tour dates, bio and press material.',
+  description: siteDescription,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName,
+    title: siteName,
+    description: siteDescription,
+    url: '/',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteName,
+    description: siteDescription,
+  },
 };
 
 export default async function RootLayout({
@@ -40,8 +54,14 @@ export default async function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body className={`${inter.variable} ${oswald.variable} font-sans bg-background text-foreground antialiased`}>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-sm focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
+        >
+          Skip to content
+        </a>
         <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} />
-        <main className="min-h-screen">{children}</main>
+        <main id="main" className="min-h-screen">{children}</main>
         <Footer bandName={bandName} socialLinks={settings?.socialLinks ?? []} />
       </body>
     </html>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useRef, useState, useTransition, type FormEvent } from 'react';
 import { sendContactEmail } from '@/app/actions/sendEmail';
 import { cn } from '@/lib/utils';
 
@@ -12,15 +12,21 @@ export default function ContactForm({ className }: ContactFormProps) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
 
-  function handleSubmit(formData: FormData) {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Not using <form action>, because React would reset the fields even when sending fails.
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     startTransition(async () => {
       const res = await sendContactEmail(formData);
       setResult(res);
+      if (res.success) formRef.current?.reset();
     });
   }
 
   return (
-    <form action={handleSubmit} className={cn('mt-12 space-y-6', className)}>
+    <form ref={formRef} onSubmit={handleSubmit} className={cn('mt-12 space-y-6', className)}>
       <div>
         <label htmlFor="name" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
           Name
@@ -31,7 +37,7 @@ export default function ContactForm({ className }: ContactFormProps) {
           type="text"
           required
           maxLength={100}
-          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground outline-none transition-colors focus:border-accent"
+          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
       </div>
 
@@ -45,7 +51,7 @@ export default function ContactForm({ className }: ContactFormProps) {
           type="email"
           required
           maxLength={254}
-          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground outline-none transition-colors focus:border-accent"
+          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
       </div>
 
@@ -59,7 +65,7 @@ export default function ContactForm({ className }: ContactFormProps) {
           required
           maxLength={5000}
           rows={6}
-          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground outline-none transition-colors focus:border-accent"
+          className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
       </div>
 

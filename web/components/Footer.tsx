@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { toHttpsUrl } from '@/lib/embeds';
 import type { SocialLink } from '@/sanity/types';
 
 interface FooterProps {
@@ -17,28 +18,31 @@ export default function Footer({ bandName, socialLinks = [] }: FooterProps) {
         </p>
 
         <div className="flex items-center gap-4">
-          {socialLinks.map((link) => (
-            <a
-              key={link.platform}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-muted transition-colors hover:text-accent"
-              aria-label={link.platform}
-            >
-              {link.platform}
-            </a>
-          ))}
+          {socialLinks.map((link, index) => {
+            const href = toHttpsUrl(link.url);
+            if (!href) return null;
+            return (
+              <a
+                key={`${link.platform}-${index}`}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted capitalize transition-colors hover:text-accent"
+              >
+                {link.platform}
+              </a>
+            );
+          })}
         </div>
 
-        <div className="flex items-center gap-6 text-xs">
+        <nav aria-label="Legal" className="flex items-center gap-6 text-xs">
           <Link href="/impressum" className="text-muted transition-colors hover:text-accent">
             Impressum
           </Link>
           <Link href="/datenschutz" className="text-muted transition-colors hover:text-accent">
             Datenschutz
           </Link>
-        </div>
+        </nav>
       </div>
     </footer>
   );

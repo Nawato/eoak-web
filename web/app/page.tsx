@@ -6,6 +6,8 @@ import TourDates from '@/components/TourDates';
 import BioSection from '@/components/BioSection';
 import GallerySection from '@/components/GallerySection';
 import ContactSection from '@/components/ContactSection';
+import { siteUrl } from '@/lib/site';
+import { toHttpsUrl } from '@/lib/embeds';
 
 export default async function HomePage() {
   const settings = await getSiteSettings();
@@ -13,8 +15,21 @@ export default async function HomePage() {
 
   const bandName = settings?.bandName ?? 'End Of All Known';
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MusicGroup',
+    name: bandName,
+    url: siteUrl,
+    genre: 'Metalcore',
+    sameAs: (settings?.socialLinks ?? []).map((link) => toHttpsUrl(link.url)).filter(Boolean),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <Hero bandName={bandName} />
 
       <MediaSection

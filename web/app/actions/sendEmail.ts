@@ -73,8 +73,13 @@ export async function sendContactEmail(formData: FormData): Promise<SendContactE
   }
 
   const requestHeaders = await headers();
-  const clientIp = requestHeaders.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(clientIp)) {
+  // Prefer headers set by the hosting platform; x-forwarded-for can be spoofed by clients.
+  const clientIp =
+    requestHeaders.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() ||
+    requestHeaders.get('x-real-ip')?.trim() ||
+    null;
+  // Without a trustworthy IP we skip the per-client limit instead of throttling every visitor together.
+  if (clientIp && isRateLimited(clientIp)) {
     return { success: false, error: 'Too many messages. Please try again later.' };
   }
 

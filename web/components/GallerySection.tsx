@@ -46,13 +46,15 @@ export default function GallerySection({ gallery = [] }: GallerySectionProps) {
             return (
               <button
                 key={index}
+                type="button"
+                aria-haspopup="dialog"
                 onClick={() => setSelected(item)}
                 className="group relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-white/10"
               >
                 {imageUrl ? (
                   <Image
                     src={imageUrl}
-                    alt={item.caption ?? `Gallery image ${index + 1}`}
+                    alt={item.caption || `Gallery image ${index + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"

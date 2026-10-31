@@ -68,7 +68,7 @@ export default function Lightbox({ image, caption, onClose }: LightboxProps) {
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt={caption ?? 'Gallery image'}
+            alt={caption || 'Gallery image'}
             width={1600}
             height={1200}
             sizes="(min-width: 896px) 896px, 100vw"

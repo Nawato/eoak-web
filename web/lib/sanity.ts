@@ -19,9 +19,11 @@ export const sanityClient = createClient({
 });
 
 const REVALIDATE_SECONDS = 60;
+export const SANITY_CACHE_TAG = 'sanity';
 
+// Errors propagate on purpose: a failed fetch must not be cached as "no content".
 function fetchDocument<T>(query: string): Promise<T | null> {
-  return sanityClient.fetch<T | null>(query, {}, { next: { revalidate: REVALIDATE_SECONDS } });
+  return sanityClient.fetch<T | null>(query, {}, { next: { revalidate: REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] } });
 }
 
 export interface SiteSettings {
@@ -43,17 +45,8 @@ export interface Impressum {
   representedBy: string;
 }
 
-async function safeFetch<T>(label: string, query: string): Promise<T | null> {
-  try {
-    return await fetchDocument<T>(query);
-  } catch (error) {
-    console.error(`Failed to fetch ${label} from Sanity:`, error instanceof Error ? error.message : error);
-    return null;
-  }
-}
+export const getSiteSettings = cache(() => fetchDocument<SiteSettings>(`*[_id == "siteSettings"][0]`));
 
-export const getSiteSettings = cache(() => safeFetch<SiteSettings>('site settings', `*[_id == "siteSettings"][0]`));
+export const getPressKit = cache(() => fetchDocument<PressKit>(`*[_id == "pressKit"][0]{..., pressKitPdf{..., asset->{url}}}`));
 
-export const getPressKit = cache(() => safeFetch<PressKit>('press kit', `*[_id == "pressKit"][0]{..., pressKitPdf{..., asset->{url}}}`));
-
-export const getImpressum = cache(() => safeFetch<Impressum>('impressum', `*[_id == "impressum"][0]`));
+export const getImpressum = cache(() => fetchDocument<Impressum>(`*[_id == "impressum"][0]`));

@@ -33,7 +33,7 @@ export default defineType({
               name: 'url',
               title: 'URL',
               type: 'url',
-              validation: (Rule) => Rule.required(),
+              validation: (Rule) => Rule.required().uri({ scheme: ['https'] }),
             },
           ],
         },

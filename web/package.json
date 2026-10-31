@@ -6,13 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@portabletext/react": "^8.0.1",
     "@sanity/image-url": "^2.1.1",
     "clsx": "^2.1.1",
-    "framer-motion": "^14.9.0",
     "lucide-react": "^1.65.0",
     "next": "^16.4.3",
     "next-sanity": "^13.4.0",
@@ -31,7 +31,8 @@
     "eslint-config-next": "^16.4.3",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
   },
   "overrides": {
     "js-yaml": "^3.15.2",
