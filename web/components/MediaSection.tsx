@@ -1,16 +1,14 @@
 import ConsentEmbed from '@/components/ConsentEmbed';
-import { getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl } from '@/lib/embeds';
+import { getSpotifyEmbedUrl, getYouTubeVideoId, getHttpsLinks, type LabeledLink } from '@/lib/embeds';
 
 interface MediaSectionProps {
   latestYoutubeUrl: string;
   featuredSpotifyUrl: string;
-  streamingLinks?: { label?: string; url?: string }[];
+  streamingLinks?: LabeledLink[];
 }
 
 export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, streamingLinks = [] }: MediaSectionProps) {
-  const links = streamingLinks
-    .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
-    .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
+  const links = getHttpsLinks(streamingLinks);
   const videoId = getYouTubeVideoId(latestYoutubeUrl);
   const spotifyEmbedUrl = getSpotifyEmbedUrl(featuredSpotifyUrl);
 

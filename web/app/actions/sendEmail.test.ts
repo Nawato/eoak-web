@@ -94,6 +94,13 @@ describe('sendContactEmail', () => {
     expect(send.mock.calls[0][0].html).not.toContain('<script>');
   });
 
+  it.each(['name', 'email', 'message'])('rejects file input for the %s field', async (field) => {
+    const form = contactForm();
+    form.set(field, new Blob(['not a text field']), 'input.txt');
+    expect((await sendContactEmail(form)).success).toBe(false);
+    expect(send).not.toHaveBeenCalled();
+  });
+
   it('reports a CMS failure instead of claiming delivery', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     getSiteSettings.mockRejectedValue(new Error('Sanity unavailable'));

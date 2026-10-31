@@ -52,3 +52,14 @@ export function toHttpsUrl(value: string | undefined | null): string | null {
     return null;
   }
 }
+
+export interface LabeledLink {
+  label?: string;
+  url?: string;
+}
+
+export function getHttpsLinks(links: LabeledLink[] = []): { label: string; href: string }[] {
+  return links
+    .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
+    .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
+}

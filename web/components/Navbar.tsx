@@ -1,26 +1,18 @@
 import Link from 'next/link';
-import { Camera, Video, AtSign, Users, Music2, type LucideIcon } from 'lucide-react';
 import MobileNav from '@/components/MobileNav';
-import { navLinks } from '@/lib/nav';
+import type { NavLink } from '@/lib/nav';
 import { toHttpsUrl } from '@/lib/embeds';
 import { getLogo } from '@/lib/sanity-image';
-import type { SocialLink } from '@/sanity/types';
-
-const platformIcons: Record<string, LucideIcon> = {
-  instagram: Camera,
-  youtube: Video,
-  twitter: AtSign,
-  facebook: Users,
-  tiktok: Music2,
-};
+import { socialPlatforms, type SocialLink } from '@/sanity/types';
 
 interface NavbarProps {
   bandName: string;
   socialLinks?: SocialLink[];
   logo?: unknown;
+  links: NavLink[];
 }
 
-export default function Navbar({ bandName, socialLinks = [], logo }: NavbarProps) {
+export default function Navbar({ bandName, socialLinks = [], logo, links }: NavbarProps) {
   const logoSource = getLogo(logo, 400);
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-md">
@@ -33,15 +25,15 @@ export default function Navbar({ bandName, socialLinks = [], logo }: NavbarProps
               alt={bandName}
               width={logoSource.width}
               height={logoSource.height}
-              className="h-8 w-auto"
+              className="h-auto max-h-8 w-auto max-w-36 lg:max-w-44"
             />
           ) : (
             bandName
           )}
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-8 md:flex">
-          {navLinks.map((link) => (
+        <nav aria-label="Main" className="hidden items-center gap-4 xl:flex">
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -54,7 +46,7 @@ export default function Navbar({ bandName, socialLinks = [], logo }: NavbarProps
 
         <div className="flex items-center gap-3">
           {socialLinks.map((link, index) => {
-            const Icon = platformIcons[link.platform];
+            const Icon = socialPlatforms.find((platform) => platform.value === link.platform)?.icon;
             const href = toHttpsUrl(link.url);
             if (!Icon || !href) return null;
             return (
@@ -70,7 +62,7 @@ export default function Navbar({ bandName, socialLinks = [], logo }: NavbarProps
               </a>
             );
           })}
-          <MobileNav links={navLinks} />
+          <MobileNav links={links} />
         </div>
       </div>
     </header>

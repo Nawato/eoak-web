@@ -2,36 +2,7 @@
 
 import Link from 'next/link';
 import { useSyncExternalStore, type ReactNode } from 'react';
-
-const STORAGE_PREFIX = 'eoak-consent:';
-const CHANGE_EVENT = 'eoak-consent-change';
-
-function subscribe(callback: () => void) {
-  window.addEventListener(CHANGE_EVENT, callback);
-  window.addEventListener('storage', callback);
-  return () => {
-    window.removeEventListener(CHANGE_EVENT, callback);
-    window.removeEventListener('storage', callback);
-  };
-}
-
-function readConsent(provider: string): boolean {
-  try {
-    return window.localStorage.getItem(STORAGE_PREFIX + provider) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function writeConsent(provider: string, value: boolean) {
-  try {
-    if (value) window.localStorage.setItem(STORAGE_PREFIX + provider, '1');
-    else window.localStorage.removeItem(STORAGE_PREFIX + provider);
-  } catch {
-    // Storage unavailable: consent only lasts until the next navigation.
-  }
-  window.dispatchEvent(new Event(CHANGE_EVENT));
-}
+import { readConsent, writeConsent, subscribeConsent } from '@/lib/consent';
 
 interface ConsentEmbedProps {
   provider: string;
@@ -42,7 +13,7 @@ interface ConsentEmbedProps {
 
 export default function ConsentEmbed({ provider, description, children, className }: ConsentEmbedProps) {
   const consented = useSyncExternalStore(
-    subscribe,
+    subscribeConsent,
     () => readConsent(provider),
     () => false,
   );

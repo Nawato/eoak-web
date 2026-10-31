@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl } from './embeds';
+import { getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl, getHttpsLinks } from './embeds';
 
 describe('getYouTubeVideoId', () => {
   it.each([
@@ -42,5 +42,26 @@ describe('toHttpsUrl', () => {
     expect(toHttpsUrl('javascript:alert(1)')).toBeNull();
     expect(toHttpsUrl('http://example.com')).toBeNull();
     expect(toHttpsUrl(undefined)).toBeNull();
+  });
+
+  describe('getHttpsLinks', () => {
+    it('preserves labels and order while rejecting missing labels and unsafe URLs', () => {
+      expect(getHttpsLinks([
+        { label: 'Spotify', url: 'https://open.spotify.com/artist/example' },
+        { label: 'Unsafe', url: 'javascript:alert(1)' },
+        { url: 'https://example.com' },
+        { label: '', url: 'https://example.com' },
+        { label: 'Missing URL' },
+        { label: 'Bandcamp', url: 'https://band.bandcamp.com' },
+      ])).toEqual([
+        { label: 'Spotify', href: 'https://open.spotify.com/artist/example' },
+        { label: 'Bandcamp', href: 'https://band.bandcamp.com/' },
+      ]);
+    });
+
+    it('returns no buttons for omitted or empty links', () => {
+      expect(getHttpsLinks()).toEqual([]);
+      expect(getHttpsLinks([])).toEqual([]);
+    });
   });
 });

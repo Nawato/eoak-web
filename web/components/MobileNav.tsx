@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import type { NavLink } from '@/lib/nav';
 
 interface MobileNavProps {
-  links: { href: string; label: string }[];
+  links: NavLink[];
 }
 
 export default function MobileNav({ links }: MobileNavProps) {
@@ -25,7 +26,7 @@ export default function MobileNav({ links }: MobileNavProps) {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="xl:hidden">
       <button
         ref={buttonRef}
         type="button"

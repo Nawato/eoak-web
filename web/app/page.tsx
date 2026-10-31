@@ -37,6 +37,7 @@ export default async function HomePage() {
         logo={settings?.logo}
         background={settings?.heroBackground}
         backgroundAlt={settings?.heroBackgroundAlt}
+        overlayOpacity={settings?.heroOverlayOpacity}
         eyebrow={settings?.heroEyebrow}
         tagline={settings?.heroTagline}
         merchUrl={toHttpsUrl(settings?.merchUrl)}
@@ -56,6 +57,8 @@ export default async function HomePage() {
         biography={pressKit?.biography}
         pressRelease={pressKit?.pressRelease ?? undefined}
         pressKitPdfUrl={pressKit?.pressKitPdf?.asset?.url}
+        pressKitUrl={pressKit?.pressKitUrl}
+        pressKitLinkLabel={pressKit?.pressKitLinkLabel}
       />
 
       <MembersSection members={members} />

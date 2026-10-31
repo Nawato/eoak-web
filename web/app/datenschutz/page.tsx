@@ -75,7 +75,8 @@ export default async function DatenschutzPage() {
             den jeweiligen Anbieter übermittelt, der außerdem Cookies oder ähnliche Technologien einsetzen kann.
           </p>
           <p className="mt-3">
-            Ihre Einwilligung wird in Ihrem Browser (localStorage) gespeichert. Sie können sie jederzeit über den
+            Ihre Einwilligung wird in Ihrem Browser (localStorage) gespeichert. Ist dieser Speicher gesperrt,
+            gilt Ihre Auswahl nur bis zum erneuten Laden der Seite. Sie können sie jederzeit über den
             Link „Revoke … consent“ unter dem jeweiligen Inhalt mit Wirkung für die Zukunft widerrufen.
           </p>
         </section>

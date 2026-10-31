@@ -56,10 +56,16 @@ Never commit `.env.local` or put secrets in `NEXT_PUBLIC_` variables.
 The Studio has three single documents plus two lists (**Releases** and **Band Members**, ordered by release date / order number):
 
 - **Site Settings** – band name, logo, hero background photo (with hotspot and alt text), hero text, share image, favicon, social links, YouTube and Spotify URLs, streaming and merch links, Bandsintown name, contact email
-- **Press Kit** – biography, press release, press kit PDF, gallery
+- **Press Kit** – biography, press release, complete press kit link (e.g. Google Drive), editable button label, optional fallback PDF, gallery
 - **Impressum** – legal details
 
 Until a logo or photo is uploaded, the site shows the band name and a gradient background.
+
+Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
+
+Add photographers under **Site Settings → Photographer Credits** with their names, optional websites/social profiles and photo attributions (e.g. live photos, member portraits or hero photo). Reorder entries by dragging them in Sanity. They appear at the bottom of every page; **Credits Heading** controls the section title. The section stays hidden until credits are added. Upload live pictures through **Press Kit → Gallery**, and member portraits through **Band Members**.
+
+For the complete press kit, paste your Google Drive folder URL into **Press Kit → Complete Press Kit Link**. In Google Drive, set sharing to **Anyone with the link → Viewer** and check access in a signed-out browser. The button opens the folder in a new tab; Google Drive is not embedded or loaded before a click. If no valid HTTPS link is configured, the existing PDF download remains available.
 
 Deploy the Studio after schema changes (requires `npx sanity login`):
 

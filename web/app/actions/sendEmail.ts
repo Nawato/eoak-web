@@ -46,18 +46,18 @@ export interface SendContactEmailResult {
 }
 
 export async function sendContactEmail(formData: FormData): Promise<SendContactEmailResult> {
-  const name = typeof formData.get('name') === 'string' ? (formData.get('name') as string) : '';
-  const email = typeof formData.get('email') === 'string' ? (formData.get('email') as string) : '';
-  const message = typeof formData.get('message') === 'string' ? (formData.get('message') as string) : '';
+  const name = formData.get('name');
+  const email = formData.get('email');
+  const message = formData.get('message');
 
   const honeypot = formData.get('website');
   if (typeof honeypot === 'string' && honeypot.length > 0) {
     return { success: true };
   }
 
-  const trimmedName = name.replace(/[\r\n]+/g, ' ').trim();
-  const trimmedEmail = email.trim();
-  const trimmedMessage = message.trim();
+  const trimmedName = typeof name === 'string' ? name.replace(/[\r\n]+/g, ' ').trim() : '';
+  const trimmedEmail = typeof email === 'string' ? email.trim() : '';
+  const trimmedMessage = typeof message === 'string' ? message.trim() : '';
 
   if (trimmedName.length < 2 || trimmedName.length > MAX_NAME) {
     return { success: false, error: 'Please enter your name.' };

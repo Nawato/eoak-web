@@ -1,17 +1,28 @@
 import PortableText from '@/components/PortableText';
+import { toHttpsUrl } from '@/lib/embeds';
 import type { PortableTextValue } from '@/sanity/types';
 
 interface BioSectionProps {
   biography?: PortableTextValue | null;
   pressRelease?: PortableTextValue | null;
   pressKitPdfUrl?: string;
+  pressKitUrl?: string | null;
+  pressKitLinkLabel?: string | null;
 }
 
 export default function BioSection({
   biography,
   pressRelease,
   pressKitPdfUrl,
+  pressKitUrl,
+  pressKitLinkLabel,
 }: BioSectionProps) {
+  const externalUrl = toHttpsUrl(pressKitUrl);
+  const pressKitHref = externalUrl ?? toHttpsUrl(pressKitPdfUrl);
+  const buttonLabel = externalUrl
+    ? pressKitLinkLabel?.trim() || 'Open Press Kit'
+    : 'Download Press Kit (PDF)';
+
   return (
     <section id="bio" className="scroll-mt-20 py-24">
       <div className="mx-auto max-w-3xl px-4 md:px-8">
@@ -34,14 +45,14 @@ export default function BioSection({
           </>
         )}
 
-        {pressKitPdfUrl && (
+        {pressKitHref && (
           <a
-            href={pressKitPdfUrl}
+            href={pressKitHref}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-12 inline-block rounded-sm bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white transition-colors hover:bg-accent-dark"
           >
-            Download Press Kit (PDF)
+            {buttonLabel}
           </a>
         )}
       </div>

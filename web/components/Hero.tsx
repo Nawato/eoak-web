@@ -7,14 +7,18 @@ interface HeroProps {
   logo?: unknown;
   background?: unknown;
   backgroundAlt?: string;
+  overlayOpacity?: number | null;
   eyebrow?: string;
   tagline?: string;
   merchUrl?: string | null;
 }
 
-export default function Hero({ bandName, logo, background, backgroundAlt, eyebrow, tagline, merchUrl }: HeroProps) {
+export default function Hero({ bandName, logo, background, backgroundAlt, overlayOpacity, eyebrow, tagline, merchUrl }: HeroProps) {
   const logoSource = getLogo(logo, 1200);
   const backgroundUrl = hasImage(background) ? getImageUrl(background, 2400) : undefined;
+  const darkening = typeof overlayOpacity === 'number' && Number.isFinite(overlayOpacity)
+    ? Math.min(85, Math.max(0, overlayOpacity)) / 100
+    : 0.55;
   return (
     <section id="top" className="relative flex min-h-screen items-center justify-center overflow-hidden">
       {backgroundUrl && (
@@ -28,8 +32,11 @@ export default function Hero({ bandName, logo, background, backgroundAlt, eyebro
           style={{ objectPosition: getObjectPosition(background) }}
         />
       )}
-      {/* Atmospheric gradient overlay keeps text readable on any photo */}
-      <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/70 via-zinc-950 to-zinc-950" />
+      <div
+        className="absolute inset-0 bg-zinc-950"
+        style={{ opacity: backgroundUrl ? darkening : 1 }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.12),transparent_60%)]" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">

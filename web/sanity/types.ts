@@ -15,6 +15,13 @@ export interface SocialLink {
   url: string;
 }
 
+export interface PhotoCredit {
+  _key: string;
+  name: string;
+  description?: string | null;
+  url?: string | null;
+}
+
 export interface PortableTextSpan {
   _key?: string;
   _type?: string;
@@ -44,6 +51,8 @@ export interface PressKit {
   biography: PortableTextValue;
   pressRelease: PortableTextValue;
   pressKitPdf?: { asset?: { url?: string } } | null;
+  pressKitUrl?: string | null;
+  pressKitLinkLabel?: string | null;
   gallery: GalleryImage[];
 }
 

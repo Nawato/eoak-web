@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { getImageUrl } from '@/lib/sanity-image';
-import { toHttpsUrl } from '@/lib/embeds';
+import { getImageUrl, hasImage } from '@/lib/sanity-image';
+import { getHttpsLinks } from '@/lib/embeds';
 import type { Release } from '@/lib/sanity';
 
 const dateFormat = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
@@ -19,10 +19,8 @@ export default function ReleasesSection({ releases }: { releases: Release[] }) {
         <h2 className="mb-12 text-center font-display text-4xl font-bold uppercase text-white">Releases</h2>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {releases.map((release) => {
-            const coverUrl = release.cover ? getImageUrl(release.cover as never, 800, 800) : undefined;
-            const links = (release.links ?? [])
-              .map((link) => ({ label: link.label, href: toHttpsUrl(link.url) }))
-              .filter((link): link is { label: string; href: string } => !!link.label && !!link.href);
+            const coverUrl = hasImage(release.cover) ? getImageUrl(release.cover, 800, 800) : undefined;
+            const links = getHttpsLinks(release.links);
             return (
               <article key={release._id} className="overflow-hidden rounded-sm border border-white/10 bg-surface">
                 <div className="relative aspect-square bg-black">

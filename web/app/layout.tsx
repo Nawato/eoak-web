@@ -4,7 +4,8 @@ import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getSiteSettings } from '@/lib/sanity';
+import { getSiteSettings, getReleases, getMembers } from '@/lib/sanity';
+import { getNavLinks } from '@/lib/nav';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
@@ -55,7 +56,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const settings = await getSiteSettings();
+  const [settings, releases, members] = await Promise.all([getSiteSettings(), getReleases(), getMembers()]);
+  const links = getNavLinks({ hasReleases: releases.length > 0, hasMembers: members.length > 0 });
   const bandName = settings?.bandName ?? 'End Of All Known';
 
   return (
@@ -70,9 +72,14 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.logo} />
+        <Navbar bandName={bandName} socialLinks={settings?.socialLinks ?? []} logo={settings?.logo} links={links} />
         <main id="main" className="min-h-screen">{children}</main>
-        <Footer bandName={bandName} socialLinks={settings?.socialLinks ?? []} />
+        <Footer
+          bandName={bandName}
+          socialLinks={settings?.socialLinks ?? []}
+          creditsHeading={settings?.creditsHeading}
+          photoCredits={settings?.photoCredits}
+        />
       </body>
     </html>
   );

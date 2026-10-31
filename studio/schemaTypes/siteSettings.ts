@@ -1,4 +1,4 @@
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export default defineType({
   name: 'siteSettings',
@@ -25,6 +25,14 @@ export default defineType({
       description: 'Full-width band photo behind the hero. Landscape, at least 2000px wide. Set the hotspot to keep the band in frame.',
       options: { hotspot: true },
     },
+    defineField({
+      name: 'heroOverlayOpacity',
+      title: 'Hero Photo Darkening (%)',
+      type: 'number',
+      description: '0 keeps the photo bright; 85 makes it very dark. Adjust for readable text. Default: 55.',
+      initialValue: 55,
+      validation: (rule) => rule.min(0).max(85).integer(),
+    }),
     {
       name: 'heroBackgroundAlt',
       title: 'Hero Background Alt Text',
@@ -136,6 +144,50 @@ export default defineType({
       description: 'One inbox for booking, management and all other inquiries.',
       initialValue: 'kontakt@endofallknown.de',
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'creditsHeading',
+      title: 'Credits Heading',
+      type: 'string',
+      initialValue: 'Photo Credits',
+      validation: (rule) => rule.custom((value) =>
+        value !== undefined && !value.trim() ? 'Enter a heading or clear the field to use the default.' : true,
+      ),
+    }),
+    defineField({
+      name: 'photoCredits',
+      title: 'Photographer Credits',
+      type: 'array',
+      description: 'Displayed at the bottom of every page, in this order. Credit live photos, member portraits and the hero photo here.',
+      of: [
+        defineArrayMember({
+          name: 'photoCredit',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'name',
+              title: 'Photographer Name',
+              type: 'string',
+              validation: (rule) => rule.required().custom((value) =>
+                value !== undefined && !value.trim() ? 'Enter the photographer name.' : true,
+              ),
+            }),
+            defineField({
+              name: 'description',
+              title: 'Photo Attribution',
+              type: 'string',
+              description: 'Optional: e.g. Live photos, Berlin 2026; band portraits; hero photo.',
+            }),
+            defineField({
+              name: 'url',
+              title: 'Website or Social Profile',
+              type: 'url',
+              validation: (rule) => rule.uri({ scheme: ['https'] }),
+            }),
+          ],
+          preview: { select: { title: 'name', subtitle: 'description' } },
+        }),
+      ],
     }),
   ],
 });
