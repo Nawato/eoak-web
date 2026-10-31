@@ -36,7 +36,7 @@ export default function Hero({ bandName, logo, background, backgroundAlt, overla
         className="absolute inset-0 bg-zinc-950"
         style={{ opacity: backgroundUrl ? darkening : 1 }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent" />
+      <div className="background-edge-fade pointer-events-none absolute inset-x-0 bottom-0 rotate-180" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.12),transparent_60%)]" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">

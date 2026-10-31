@@ -1,6 +1,6 @@
 import { cache } from 'react';
 import { createClient } from 'next-sanity';
-import type { PressKit, SocialLink, PhotoCredit } from '@/sanity/types';
+import type { PressKit, SocialLink, PhotoCredit, BackgroundArea, BackgroundSettings } from '@/sanity/types';
 import type { LabeledLink } from '@/lib/embeds';
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
@@ -54,6 +54,7 @@ export interface SiteSettings {
   favicon?: unknown;
   creditsHeading?: string | null;
   photoCredits?: PhotoCredit[] | null;
+  pageBackgrounds?: Partial<Record<BackgroundArea, BackgroundSettings | null>> | null;
 }
 
 export interface Impressum {

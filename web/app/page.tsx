@@ -1,6 +1,7 @@
 import { getSiteSettings, getPressKit, getReleases, getMembers } from '@/lib/sanity';
 import type { SanityImageSource } from '@/lib/sanity-image';
 import Hero from '@/components/Hero';
+import BackgroundSurface from '@/components/BackgroundSurface';
 import MediaSection from '@/components/MediaSection';
 import TourDates from '@/components/TourDates';
 import BioSection from '@/components/BioSection';
@@ -43,40 +44,54 @@ export default async function HomePage() {
         merchUrl={toHttpsUrl(settings?.merchUrl)}
       />
 
-      <MediaSection
-        latestYoutubeUrl={settings?.latestYoutubeUrl ?? ''}
-        featuredSpotifyUrl={settings?.featuredSpotifyUrl ?? ''}
-        streamingLinks={settings?.streamingLinks}
-      />
+      <BackgroundSurface background={settings?.pageBackgrounds?.music}>
+        <MediaSection
+          latestYoutubeUrl={settings?.latestYoutubeUrl ?? ''}
+          featuredSpotifyUrl={settings?.featuredSpotifyUrl ?? ''}
+          streamingLinks={settings?.streamingLinks}
+        />
+      </BackgroundSurface>
 
-      <ReleasesSection releases={releases} />
+      {releases.length > 0 && (
+        <BackgroundSurface background={settings?.pageBackgrounds?.releases}>
+          <ReleasesSection releases={releases} />
+        </BackgroundSurface>
+      )}
 
-      <TourDates artistName={settings?.bandsintownArtistName ?? bandName} />
+      <BackgroundSurface background={settings?.pageBackgrounds?.shows}>
+        <TourDates artistName={settings?.bandsintownArtistName ?? bandName} />
+      </BackgroundSurface>
 
-      <BioSection
-        biography={pressKit?.biography}
-        pressRelease={pressKit?.pressRelease ?? undefined}
-        pressKitPdfUrl={pressKit?.pressKitPdf?.asset?.url}
-        pressKitUrl={pressKit?.pressKitUrl}
-        pressKitLinkLabel={pressKit?.pressKitLinkLabel}
-      />
+      <BackgroundSurface background={settings?.pageBackgrounds?.bio}>
+        <BioSection
+          biography={pressKit?.biography}
+          pressRelease={pressKit?.pressRelease ?? undefined}
+          pressKitPdfUrl={pressKit?.pressKitPdf?.asset?.url}
+          pressKitUrl={pressKit?.pressKitUrl}
+          pressKitLinkLabel={pressKit?.pressKitLinkLabel}
+        />
+      </BackgroundSurface>
 
-      <MembersSection members={members} />
+      {members.length > 0 && (
+        <BackgroundSurface background={settings?.pageBackgrounds?.band}>
+          <MembersSection members={members} />
+        </BackgroundSurface>
+      )}
 
-      <GallerySection
-        gallery={
-          (pressKit?.gallery ?? [])
+      <BackgroundSurface background={settings?.pageBackgrounds?.gallery}>
+        <GallerySection
+          gallery={(pressKit?.gallery ?? [])
             .filter((item) => (item.image as { asset?: unknown } | null | undefined)?.asset)
             .map((item) => ({
-            ...item,
-            image: item.image as SanityImageSource,
-          }))
-        }
-      />
+              ...item,
+              image: item.image as SanityImageSource,
+            }))}
+        />
+      </BackgroundSurface>
 
-      <ContactSection
-        contactEmail={settings?.contactEmail ?? defaultContactEmail}
-      />
+      <BackgroundSurface background={settings?.pageBackgrounds?.contact}>
+        <ContactSection contactEmail={settings?.contactEmail ?? defaultContactEmail} />
+      </BackgroundSurface>
     </>
   );
 }

@@ -42,6 +42,19 @@
 }
 
 @layer utilities {
+  .background-edge-fade {
+    height: clamp(3rem, 8vw, 6rem);
+    background: linear-gradient(
+      to bottom,
+      #09090b 0%,
+      rgb(9 9 11 / 0.9) 15%,
+      rgb(9 9 11 / 0.65) 35%,
+      rgb(9 9 11 / 0.35) 55%,
+      rgb(9 9 11 / 0.1) 78%,
+      transparent 100%
+    );
+  }
+
   .text-gradient {
     @apply bg-clip-text text-transparent bg-gradient-to-b from-zinc-100 via-zinc-300 to-zinc-500;
   }

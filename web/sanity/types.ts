@@ -22,6 +22,16 @@ export interface PhotoCredit {
   url?: string | null;
 }
 
+export interface BackgroundSettings {
+  image?: unknown;
+  alt?: string | null;
+  overlayOpacity?: number | null;
+}
+
+export type BackgroundArea =
+  | 'music' | 'releases' | 'shows' | 'bio' | 'band'
+  | 'gallery' | 'contact' | 'impressum' | 'privacy';
+
 export interface PortableTextSpan {
   _key?: string;
   _type?: string;

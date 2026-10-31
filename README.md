@@ -65,6 +65,8 @@ Until a logo or photo is uploaded, the site shows the band name and a gradient b
 
 Use **Site Settings → Hero Photo Darkening (%)** to balance photo visibility and text readability (default 55%). Releases and Band navigation links appear only when their sections have published content. On smaller screens the menu collapses to avoid crowding. Embedded media also works when browser storage is blocked; in that case consent lasts until the page is reloaded.
 
+Under **Site Settings → Page & Section Backgrounds**, set independent photos for Music, Releases, Tour Dates, Bio / Press, The Band, Gallery, Contact, Impressum and Privacy / Datenschutz. Each has a hotspot, optional image description and darkening control (default 65%). Photos fade into the page at the edges; areas without an image keep their original styling. The hero uses its existing separate settings.
+
 Add photographers under **Site Settings → Photographer Credits** with their names, optional websites/social profiles and photo attributions (e.g. live photos, member portraits or hero photo). Reorder entries by dragging them in Sanity. They appear at the bottom of every page; **Credits Heading** controls the section title. The section stays hidden until credits are added. Upload live pictures through **Press Kit → Gallery**, and member portraits through **Band Members**.
 
 For the complete press kit, paste your Google Drive folder URL into **Press Kit → Complete Press Kit Link**. In Google Drive, set sharing to **Anyone with the link → Viewer** and check access in a signed-out browser. The button opens the folder in a new tab; Google Drive is not embedded or loaded before a click. If no valid HTTPS link is configured, the existing PDF download remains available.

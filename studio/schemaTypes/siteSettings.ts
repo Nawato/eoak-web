@@ -1,10 +1,12 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import pageBackgrounds from './pageBackgrounds';
 
 export default defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
   fields: [
+    pageBackgrounds,
     {
       name: 'bandName',
       title: 'Band Name',
