@@ -11,11 +11,11 @@ const platformIcons: Record<string, LucideIcon> = {
 };
 
 const navLinks = [
-  { href: '#music', label: 'Music' },
-  { href: '#shows', label: 'Shows' },
-  { href: '#bio', label: 'Bio' },
-  { href: '#gallery', label: 'Gallery' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#music', label: 'Music' },
+  { href: '/#shows', label: 'Shows' },
+  { href: '/#bio', label: 'Bio' },
+  { href: '/#gallery', label: 'Gallery' },
+  { href: '/#contact', label: 'Contact' },
 ];
 
 interface NavbarProps {
@@ -33,13 +33,13 @@ export default function Navbar({ bandName, socialLinks = [] }: NavbarProps) {
 
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-xs font-medium uppercase tracking-widest text-muted transition-colors hover:text-accent"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
