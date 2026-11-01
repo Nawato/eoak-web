@@ -9,6 +9,7 @@
     "test:web": "npm --prefix web run test",
     "lint": "npm --prefix web run lint",
     "typecheck": "npm --prefix web run typecheck",
+    "verify": "npm run lint && npm run typecheck && npm run test && npm run build:web",
     "install:all": "npm --prefix web install && npm --prefix studio install"
   }
 }

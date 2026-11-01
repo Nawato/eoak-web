@@ -38,7 +38,7 @@ Use `web/.env.local` locally and your hosting provider's environment settings in
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` | Required Sanity connection |
-| `NEXT_PUBLIC_SITE_URL` | Public origin for canonical URLs, sitemap and sharing |
+| `NEXT_PUBLIC_SITE_URL` | Public origin for canonical URLs, sitemap and sharing; required in production |
 | `SANITY_API_READ_TOKEN` | Optional read token for private datasets; the website serves published content only |
 | `SANITY_API_WRITE_TOKEN` | Release click counting; use the least privileges your Sanity plan supports |
 | `SANITY_REVALIDATE_SECRET` | Signed content-revalidation webhook |
@@ -46,7 +46,7 @@ Use `web/.env.local` locally and your hosting provider's environment settings in
 | `CONTACT_FROM_EMAIL` | Resend-verified sender; defaults to `kontakt@endofallknown.de` |
 | `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID` | Instagram professional-account token and numeric user ID |
 | `RELEASE_CLICK_HASH_SECRET` | Independent random secret for daily IP deduplication |
-| `RELEASE_CLICK_IP_HEADER` | Client-IP header overwritten by a trusted reverse proxy |
+| `RELEASE_CLICK_IP_HEADER` | Client-IP header overwritten by a trusted reverse proxy (click deduplication and contact-form rate limiting) |
 | `RELEASE_CLICK_CLEANUP_SECRET` | Bearer secret for the scheduled analytics cleanup endpoint |
 | `SESSION_SECRET` | Session secret for authorizing scheduled/admin API requests; falls back to `RELEASE_CLICK_CLEANUP_SECRET` if unset |
 
@@ -54,7 +54,7 @@ Never commit secrets or expose them through `NEXT_PUBLIC_` variables. Do not reu
 
 ## Editing content
 
-Publish changes in Studio to make them visible. An uploaded asset or saved draft alone does not update the website. Local development bypasses the content cache; production content is cached for 60 seconds.
+Publish changes in Studio to make them visible. An uploaded asset or saved draft alone does not update the website. Local development bypasses the content cache; in production, Sanity content is cached for 60 seconds and the webhook clears it immediately. Pages are rendered per request so date-dependent release badges stay accurate.
 
 | Studio area | Content |
 | --- | --- |
