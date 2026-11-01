@@ -38,7 +38,7 @@ export default async function ReleasePage({ params }: Props) {
       <section className="mx-auto max-w-4xl px-4 py-24 md:px-8">
         <Link
           href="/#releases"
-          className="text-xs font-semibold uppercase tracking-widest text-zinc-400 transition-colors hover:text-accent"
+          className="text-xs font-semibold uppercase tracking-widest text-zinc-400 transition-colors hover:text-accent-text"
         >
           ← All releases
         </Link>
@@ -57,11 +57,11 @@ export default async function ReleasePage({ params }: Props) {
           </div>
           <div>
             {upcoming && (
-              <span className="inline-block rounded-sm bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-black">
+              <span className="inline-block rounded-sm bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
                 Coming soon
               </span>
             )}
-            <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-accent">
+            <p className="mt-3 text-xs font-semibold uppercase tracking-widest text-accent-text">
               {[release.releaseType, formatRelativeDate(release.releaseDate, now)].filter(Boolean).join(' · ')}
             </p>
             <h1 className="mt-2 font-display text-4xl font-bold uppercase text-white">{release.title}</h1>
@@ -77,7 +77,7 @@ export default async function ReleasePage({ params }: Props) {
                     href={link.key ? `/go/${encodeURIComponent(release._id)}/${encodeURIComponent(link.key)}` : link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-sm border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+                    className="rounded-sm border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
                   >
                     {link.label}
                   </a>

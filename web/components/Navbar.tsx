@@ -38,7 +38,7 @@ export default function Navbar({ bandName, socialLinks = [], logo, links }: Navb
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs font-medium uppercase tracking-widest text-muted transition-colors hover:text-accent"
+              className="text-xs font-medium uppercase tracking-widest text-muted transition-colors hover:text-accent-text"
             >
               {link.label}
             </Link>
@@ -57,7 +57,7 @@ export default function Navbar({ bandName, socialLinks = [], logo, links }: Navb
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={platform.label}
-                className="text-muted transition-colors hover:text-accent"
+                className="text-muted transition-colors hover:text-accent-text"
               >
                 <SocialIcon platform={platform.value} className="h-5 w-5" />
               </a>

@@ -51,7 +51,7 @@ export default function MobileNav({ links }: MobileNavProps) {
                 <Link
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-sm px-2 py-3 text-sm font-medium uppercase tracking-widest text-zinc-300 transition-colors hover:text-accent"
+                  className="block rounded-sm px-2 py-3 text-sm font-medium uppercase tracking-widest text-zinc-300 transition-colors hover:text-accent-text"
                 >
                   {link.label}
                 </Link>

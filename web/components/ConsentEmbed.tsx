@@ -41,7 +41,7 @@ export default function ConsentEmbed({ provider, description, children, classNam
         <p className="max-w-md text-sm text-zinc-400">
           {description} Loading this content transfers your IP address to {provider} and may set cookies or
           similar identifiers. See our{' '}
-          <Link href="/datenschutz" className="text-accent underline underline-offset-2 hover:text-rose-300">
+          <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-rose-300">
             privacy policy
           </Link>
           .

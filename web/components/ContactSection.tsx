@@ -19,7 +19,7 @@ export default function ContactSection({ contactEmail }: ContactSectionProps) {
           href={`mailto:${contactEmail}`}
           className="block rounded-sm border border-white/10 bg-surface p-6 text-center transition-colors hover:border-accent"
         >
-          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent-text">
             Booking &amp; Management
           </p>
           <p className="break-all text-sm text-muted">{contactEmail}</p>

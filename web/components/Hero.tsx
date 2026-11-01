@@ -40,7 +40,7 @@ export default function Hero({ bandName, logo, background, backgroundAlt, overla
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(225,29,72,0.12),transparent_60%)]" />
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">
-        <p className="mb-6 text-xs font-medium uppercase tracking-[0.4em] text-accent">
+        <p className="mb-6 text-xs font-medium uppercase tracking-[0.4em] text-accent-text">
           {eyebrow ?? 'Independent Metalcore'}
         </p>
         {logoSource ? (
@@ -72,7 +72,7 @@ export default function Hero({ bandName, logo, background, backgroundAlt, overla
           </Link>
           <Link
             href="#shows"
-            className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+            className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
           >
             Tour Dates
           </Link>
@@ -81,7 +81,7 @@ export default function Hero({ bandName, logo, background, backgroundAlt, overla
               href={merchUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+              className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
             >
               Merch
             </a>

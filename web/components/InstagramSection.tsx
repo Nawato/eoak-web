@@ -56,7 +56,7 @@ export default function InstagramSection({ feed, heading, followLabel, profileUr
               href={profile}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-sm border border-white/15 px-6 py-3 text-sm text-foreground transition-colors hover:border-accent hover:text-accent"
+              className="inline-block rounded-sm border border-white/15 px-6 py-3 text-sm text-foreground transition-colors hover:border-accent hover:text-accent-text"
             >
               {followLabel?.trim() || 'Follow on Instagram'}
             </a>

@@ -18,7 +18,7 @@ function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; 
   const relative = formatRelativeDate(release.releaseDate, now);
   const href = release.slug ? `/releases/${encodeURIComponent(release.slug)}` : undefined;
   const title = href ? (
-    <Link href={href} className="transition-colors hover:text-accent">
+    <Link href={href} className="transition-colors hover:text-accent-text">
       {release.title}
     </Link>
   ) : (
@@ -40,17 +40,17 @@ function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; 
           />
         )}
         {upcoming && (
-          <span className="absolute left-3 top-3 rounded-sm bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-black">
+          <span className="absolute left-3 top-3 rounded-sm bg-accent px-3 py-1 text-xs font-bold uppercase tracking-widest text-white">
             Coming soon
           </span>
         )}
       </div>
       <div className="p-5">
-        <p className="text-xs font-semibold uppercase tracking-widest text-accent">
+        <p className="text-xs font-semibold uppercase tracking-widest text-accent-text">
           {[release.releaseType, relative].filter(Boolean).join(' · ')}
         </p>
         <h3 className="mt-2 font-display text-2xl font-semibold uppercase text-white">{title}</h3>
-        <p className="mt-1 text-xs uppercase tracking-widest text-zinc-500">{formatDate(release.releaseDate)}</p>
+        <p className="mt-1 text-xs uppercase tracking-widest text-zinc-400">{formatDate(release.releaseDate)}</p>
         {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map((link) => (
@@ -59,7 +59,7 @@ function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; 
                 href={link.key ? `/go/${encodeURIComponent(release._id)}/${encodeURIComponent(link.key)}` : link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-sm border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+                className="rounded-sm border border-white/15 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
               >
                 {link.label}
               </a>

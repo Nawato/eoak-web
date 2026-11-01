@@ -76,11 +76,11 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
           <div className="mt-12 flex flex-wrap justify-center gap-3">
             {links.map((link) => (
               <a
-                key={link.href}
+                key={link.key ?? link.href}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-sm border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent"
+                className="rounded-sm border border-white/15 px-6 py-3 text-xs font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
               >
                 {link.label}
               </a>

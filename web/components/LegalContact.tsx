@@ -29,7 +29,7 @@ export default function LegalContact({ operator }: { operator: Impressum | null 
       {operator.representedBy && <p>Vertreten durch: {operator.representedBy}</p>}
       <p>
         E-Mail:{' '}
-        <a href={`mailto:${operator.email}`} className="text-accent underline">
+        <a href={`mailto:${operator.email}`} className="text-accent-text underline">
           {operator.email}
         </a>
         {operator.phone && (

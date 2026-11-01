@@ -27,7 +27,7 @@ export default function MembersSection({ members }: { members: Member[] }) {
                   )}
                 </div>
                 <p className="font-display text-xl font-semibold uppercase text-white">{member.name}</p>
-                {member.role && <p className="text-xs uppercase tracking-widest text-accent">{member.role}</p>}
+                {member.role && <p className="text-xs uppercase tracking-widest text-accent-text">{member.role}</p>}
               </li>
             );
           })}

@@ -97,7 +97,7 @@ export default function ContactForm({ className }: ContactFormProps) {
       </button>
 
       {result && !result.success && (
-        <p role="alert" className="rounded-sm border border-accent/50 bg-accent/10 p-4 text-center text-sm text-accent">
+        <p role="alert" className="rounded-sm border border-accent/50 bg-accent/10 p-4 text-center text-sm text-accent-text">
           {result.error}
         </p>
       )}

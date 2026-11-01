@@ -31,7 +31,7 @@ export default function Footer({ bandName, socialLinks = [], creditsHeading, pho
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-foreground underline underline-offset-4 transition-colors hover:text-accent"
+                      className="text-foreground underline underline-offset-4 transition-colors hover:text-accent-text"
                     >
                       {credit.name}
                     </a>
@@ -62,7 +62,7 @@ export default function Footer({ bandName, socialLinks = [], creditsHeading, pho
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={platform.label}
-                className="text-muted transition-colors hover:text-accent"
+                className="text-muted transition-colors hover:text-accent-text"
               >
                 <SocialIcon platform={platform.value} className="h-5 w-5" />
               </a>
@@ -71,10 +71,10 @@ export default function Footer({ bandName, socialLinks = [], creditsHeading, pho
         </div>
 
         <nav aria-label="Legal" className="flex items-center gap-6 text-xs">
-          <Link href="/impressum" className="text-muted transition-colors hover:text-accent">
+          <Link href="/impressum" className="text-muted transition-colors hover:text-accent-text">
             Impressum
           </Link>
-          <Link href="/datenschutz" className="text-muted transition-colors hover:text-accent">
+          <Link href="/datenschutz" className="text-muted transition-colors hover:text-accent-text">
             Datenschutz
           </Link>
         </nav>

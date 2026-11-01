@@ -22,7 +22,7 @@ export default async function DatenschutzPage() {
     <BackgroundSurface background={settings?.pageBackgrounds?.privacy}>
       <section lang="de" className="mx-auto max-w-3xl px-4 py-24">
         <h1 className="mb-8 text-4xl font-display text-white">Datenschutzerklärung</h1>
-        <div className="space-y-8 text-zinc-400 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-white [&_p+p]:mt-3 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6 [&_a]:text-accent [&_a]:underline">
+        <div className="space-y-8 text-zinc-400 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:text-white [&_h3]:mb-2 [&_h3]:mt-4 [&_h3]:text-white [&_p+p]:mt-3 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-6 [&_a]:text-accent-text [&_a]:underline">
           {incomplete && (
             <p role="status" className="rounded-sm border border-amber-500/40 p-4">
               Diese Datenschutzhinweise sind noch unvollständig. Angaben zu Dienstleistern, Speicherfristen,

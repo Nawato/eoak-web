@@ -45,12 +45,12 @@ export default async function ImpressumPage() {
             <p className="whitespace-pre-line">{impressum.additionalLegalDetails}</p>
           )}
           <p>
-            <Link href="/datenschutz" className="text-accent underline">
+            <Link href="/datenschutz" className="text-accent-text underline">
               Datenschutzerklärung und Datenschutzeinstellungen
             </Link>
           </p>
           <p>
-            <Link href="/" className="text-accent hover:text-rose-300">
+            <Link href="/" className="text-accent-text hover:text-rose-300">
               ← Zurück zur Startseite
             </Link>
           </p>

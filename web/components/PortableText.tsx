@@ -40,7 +40,7 @@ const components: PortableTextComponents = {
       return (
         <a
           href={href}
-          className="text-accent underline underline-offset-2 hover:text-rose-300"
+          className="text-accent-text underline underline-offset-2 hover:text-rose-300"
           {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         >
           {children}
