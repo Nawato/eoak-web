@@ -5,6 +5,10 @@
     "dev:web": "npm --prefix web run dev",
     "dev:studio": "npm --prefix studio run dev",
     "build:web": "npm --prefix web run build",
+    "test": "npm --prefix web run test",
+    "test:web": "npm --prefix web run test",
+    "lint": "npm --prefix web run lint",
+    "typecheck": "npm --prefix web run typecheck",
     "install:all": "npm --prefix web install && npm --prefix studio install"
   }
 }

@@ -1,15 +1,9 @@
-import { timingSafeEqual } from 'node:crypto';
 import { createClient } from 'next-sanity';
+import { requireSession } from '@/lib/session';
 
 export async function POST(request: Request) {
-  const secret = process.env.RELEASE_CLICK_CLEANUP_SECRET;
-  const authorization = request.headers.get('authorization') ?? '';
-  if (!secret) return new Response('Not configured.', { status: 503 });
-  const expected = Buffer.from(`Bearer ${secret}`);
-  const actual = Buffer.from(authorization);
-  if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) {
-    return new Response('Unauthorized.', { status: 401 });
-  }
+  const sessionResponse = requireSession(request);
+  if (sessionResponse) return sessionResponse;
   const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
   const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
   const token = process.env.SANITY_API_WRITE_TOKEN;

@@ -17,6 +17,7 @@ afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 it('requires a valid bearer secret before deleting anything', async () => {
   const response = await POST(new Request('https://band.example/api/release-clicks/cleanup', { method: 'POST' }));
   expect(response.status).toBe(401);
+  expect(await response.text()).toBe('Session not found.');
   expect(mocks.delete).not.toHaveBeenCalled();
 });
 

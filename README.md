@@ -48,6 +48,7 @@ Use `web/.env.local` locally and your hosting provider's environment settings in
 | `RELEASE_CLICK_HASH_SECRET` | Independent random secret for daily IP deduplication |
 | `RELEASE_CLICK_IP_HEADER` | Client-IP header overwritten by a trusted reverse proxy |
 | `RELEASE_CLICK_CLEANUP_SECRET` | Bearer secret for the scheduled analytics cleanup endpoint |
+| `SESSION_SECRET` | Session secret for authorizing scheduled/admin API requests; falls back to `RELEASE_CLICK_CLEANUP_SECRET` if unset |
 
 Never commit secrets or expose them through `NEXT_PUBLIC_` variables. Do not reuse a write-capable token as the read token. Restart or redeploy after changing environment variables.
 
