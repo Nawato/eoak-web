@@ -93,7 +93,10 @@ describe('release click redirects', () => {
     expect(response.status).toBe(302);
     expect(response.headers.get('location')).toBe('https://music.example/release');
     expect(response.headers.get('cache-control')).toBe('no-store');
-    expect(mocks.fetch).toHaveBeenCalledWith(expect.any(String), { id: 'release', key: 'link' }, { cache: 'no-store' });
+    expect(mocks.fetch).toHaveBeenCalledWith(expect.any(String), { id: 'release', key: 'link' }, {
+      cache: 'force-cache',
+      next: { revalidate: 60, tags: ['sanity'] },
+    });
     const transaction = mocks.transactions[0];
     expect(transaction.stats).toMatchObject({ clicks: 7, uniqueClicks: 3, releaseId: 'release', linkKey: 'link' });
     expect(transaction.patchId).toBe(transaction.stats?._id);
@@ -209,7 +212,9 @@ describe('release click redirects', () => {
 
   it('makes missing write configuration explicit without breaking the link', async () => {
     vi.stubEnv('SANITY_API_WRITE_TOKEN', '');
-    expect((await route.GET(request(), context())).status).toBe(302);
+    vi.resetModules();
+    const unconfigured = await import('./route');
+    expect((await unconfigured.GET(request(), context())).status).toBe(302);
     expect(console.error).toHaveBeenCalledWith('Release click counting requires SANITY_API_WRITE_TOKEN.');
     expect(mocks.commit).not.toHaveBeenCalled();
   });

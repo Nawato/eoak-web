@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { Resend } from 'resend';
 import { getSiteSettings } from '@/lib/sanity';
 import { defaultContactEmail } from '@/lib/site';
+import { getTrustedClientIp } from '@/lib/client-ip';
 
 const MAX_NAME = 100;
 const MAX_EMAIL = 254;
@@ -76,12 +77,9 @@ export async function sendContactEmail(formData: FormData): Promise<SendContactE
   }
 
   const requestHeaders = await headers();
-  // Prefer headers set by the hosting platform; x-forwarded-for can be spoofed by clients.
-  const clientIp =
-    requestHeaders.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() ||
-    requestHeaders.get('x-real-ip')?.trim() ||
-    null;
-  // Without a trustworthy IP we skip the per-client limit instead of throttling every visitor together.
+  // Only trust a header that the hosting proxy is configured to overwrite (shared with /go).
+  // Without one we skip the per-client limit instead of throttling every visitor together.
+  const clientIp = getTrustedClientIp(requestHeaders, process.env.RELEASE_CLICK_IP_HEADER);
   if (clientIp && isRateLimited(clientIp)) {
     return { success: false, error: 'Too many messages. Please try again later.' };
   }

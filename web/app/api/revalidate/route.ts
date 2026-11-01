@@ -6,7 +6,7 @@ import { SANITY_CACHE_TAG } from '@/lib/sanity';
 export async function POST(request: NextRequest) {
   const secret = process.env.SANITY_REVALIDATE_SECRET;
   if (!secret) {
-    return NextResponse.json({ message: 'Revalidation secret is not configured.' }, { status: 500 });
+    return NextResponse.json({ message: 'Revalidation secret is not configured.' }, { status: 503 });
   }
 
   try {

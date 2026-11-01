@@ -1,14 +1,42 @@
 import { createHash, createHmac } from 'node:crypto';
-import { isIP } from 'node:net';
 import { after, NextResponse, type NextRequest } from 'next/server';
 import { createClient } from 'next-sanity';
 import { toHttpsUrl } from '@/lib/embeds';
+import { getTrustedClientIp } from '@/lib/client-ip';
+import { SANITY_CACHE_TAG } from '@/lib/cache';
 
 const BOT_PATTERN = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|curl|wget/i;
 const NO_CACHE = { 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' };
+const LOOKUP_REVALIDATE_SECONDS = 60;
 const recentClicks = new Map<string, { count: number; expires: number }>();
 type Params = { params: Promise<{ id: string; key: string }> };
 type ReleaseLink = { url: string; clicks?: number; uniqueClicks?: number };
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
+const writeToken = process.env.SANITY_API_WRITE_TOKEN;
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+// Cached lookup in production: the webhook revalidates the tag, so edited links appear immediately.
+// Local development stays uncached so Studio edits are visible right away.
+const lookupOptions = isDevelopment
+  ? { cache: 'no-store' as const }
+  : { cache: 'force-cache' as const, next: { revalidate: LOOKUP_REVALIDATE_SECONDS, tags: [SANITY_CACHE_TAG] } };
+
+// Created once per server instance; links change rarely, so the lookup below is cached.
+const client =
+  projectId && dataset
+    ? createClient({
+        projectId,
+        dataset,
+        apiVersion: '2024-01-01',
+        useCdn: false,
+        perspective: 'published',
+        token: writeToken || process.env.SANITY_API_READ_TOKEN || undefined,
+        timeout: 5000,
+        maxRetries: 0,
+      })
+    : null;
 
 function mayCount(visitor: string, limit = 20): boolean {
   const now = Date.now();
@@ -28,23 +56,16 @@ async function redirect(request: NextRequest, { params }: Params, count: boolean
       id.startsWith('drafts.') || id.startsWith('versions.') || !/^[a-zA-Z0-9_-]{1,128}$/.test(key)) {
     return new NextResponse('Not found.', { status: 404, headers: NO_CACHE });
   }
-  const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
-  const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
-  const writeToken = process.env.SANITY_API_WRITE_TOKEN;
-  if (!projectId || !dataset) {
+  if (!client) {
     console.error('Release redirect is missing Sanity configuration.');
     return new NextResponse('Not configured.', { status: 503, headers: NO_CACHE });
   }
-  const client = createClient({
-    projectId, dataset, apiVersion: '2024-01-01', useCdn: false,
-    perspective: 'published', token: writeToken || process.env.SANITY_API_READ_TOKEN || undefined,
-    timeout: 5000, maxRetries: 0,
-  });
   let link: ReleaseLink | null;
   try {
     link = await client.fetch<ReleaseLink | null>(
       `*[_type == "release" && _id == $id][0].links[_key == $key][0]{url, clicks, uniqueClicks}`,
-      { id, key }, { cache: 'no-store' },
+      { id, key },
+      lookupOptions,
     );
   } catch {
     console.error('Release link lookup failed.');
@@ -61,15 +82,11 @@ async function redirect(request: NextRequest, { params }: Params, count: boolean
       console.error('Release click counting requires SANITY_API_WRITE_TOKEN.');
     } else {
       // Only trust a header explicitly configured for a proxy that overwrites it.
-      const header = process.env.RELEASE_CLICK_IP_HEADER;
-      const ip = header ? request.headers.get(header)?.split(',')[0]?.trim() : undefined;
-      const normalizedIp = ip && isIP(ip) && !ip.includes('%')
-        ? (isIP(ip) === 6 ? new URL(`http://[${ip}]/`).hostname : ip)
-        : undefined;
+      const ip = getTrustedClientIp(request.headers, process.env.RELEASE_CLICK_IP_HEADER);
       const secret = process.env.RELEASE_CLICK_HASH_SECRET;
       const day = new Date().toISOString().slice(0, 10);
-      const visitor = normalizedIp && secret
-        ? createHmac('sha256', secret).update(JSON.stringify([day, normalizedIp])).digest('hex')
+      const visitor = ip && secret
+        ? createHmac('sha256', secret).update(JSON.stringify([day, ip])).digest('hex')
         : undefined;
       if (mayCount('all-clicks', 300) && (!visitor || mayCount(visitor))) {
         const digest = createHash('sha256').update(JSON.stringify([id, key])).digest('hex');

@@ -13,6 +13,7 @@ vi.mock('resend', () => ({
 }));
 vi.mock('next/headers', () => ({ headers }));
 vi.mock('@/lib/sanity', () => ({ getSiteSettings }));
+vi.mock('server-only', () => ({}));
 vi.mock('@/lib/site', async () => import('../../lib/site'));
 
 import { sendContactEmail } from './sendEmail';
@@ -123,7 +124,8 @@ describe('sendContactEmail', () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date('2026-10-31T12:00:00Z'));
-      headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': '192.0.2.10' }));
+      vi.stubEnv('RELEASE_CLICK_IP_HEADER', 'x-real-ip');
+      headers.mockResolvedValue(new Headers({ 'x-real-ip': '192.0.2.10' }));
       for (let index = 0; index < 3; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
       expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
       vi.advanceTimersByTime(10 * 60 * 1000);
@@ -131,15 +133,33 @@ describe('sendContactEmail', () => {
     } finally { vi.useRealTimers(); }
   });
 
+  it('ignores forwarded headers when no trusted header is configured', async () => {
+    vi.stubEnv('RELEASE_CLICK_IP_HEADER', '');
+    headers.mockResolvedValue(new Headers({
+      'x-real-ip': '198.51.100.7',
+      'x-vercel-forwarded-for': '198.51.100.7',
+      'x-forwarded-for': '198.51.100.7',
+    }));
+    for (let index = 0; index < 5; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
+  });
+
+  it('does not throttle when the configured header has no valid IP', async () => {
+    vi.stubEnv('RELEASE_CLICK_IP_HEADER', 'x-real-ip');
+    headers.mockResolvedValue(new Headers({ 'x-real-ip': 'not-an-ip' }));
+    for (let index = 0; index < 5; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
+  });
+
   it('bounds the number of retained clients even when every request uses a new address', async () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date('2026-11-01T12:00:00Z'));
+      vi.stubEnv('RELEASE_CLICK_IP_HEADER', 'x-real-ip');
       for (let index = 0; index < 1000; index++) {
-        headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': `client-${index}` }));
+        const ip = `10.0.${Math.floor(index / 256)}.${index % 256}`;
+        headers.mockResolvedValue(new Headers({ 'x-real-ip': ip }));
         expect((await sendContactEmail(contactForm())).success).toBe(true);
       }
-      headers.mockResolvedValue(new Headers({ 'x-vercel-forwarded-for': 'another-client' }));
+      headers.mockResolvedValue(new Headers({ 'x-real-ip': '10.0.3.232' }));
       expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
       vi.advanceTimersByTime(10 * 60 * 1000);
       expect((await sendContactEmail(contactForm())).success).toBe(true);

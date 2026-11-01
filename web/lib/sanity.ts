@@ -3,6 +3,9 @@ import { cache } from 'react';
 import { createClient, defineQuery } from 'next-sanity';
 import type { PressKit, SocialLink, PhotoCredit, BackgroundArea, BackgroundSettings } from '@/sanity/types';
 import type { LabeledLink } from '@/lib/embeds';
+import { SANITY_CACHE_TAG } from '@/lib/cache';
+
+export { SANITY_CACHE_TAG };
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
@@ -25,7 +28,6 @@ export const sanityClient = createClient({
 });
 
 const REVALIDATE_SECONDS = 60;
-export const SANITY_CACHE_TAG = 'sanity';
 
 // Errors propagate on purpose: a failed fetch must not be cached as "no content".
 function fetchContent<T>(query: string, params: Record<string, string> = {}): Promise<T> {
