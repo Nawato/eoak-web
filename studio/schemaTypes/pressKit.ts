@@ -39,6 +39,7 @@ export default defineType({
       name: 'pressKitPdf',
       title: 'Press Kit PDF',
       type: 'file',
+      options: { accept: 'application/pdf' },
       description: 'Optional fallback download, shown only when no complete press kit link is configured.',
     },
   ],
