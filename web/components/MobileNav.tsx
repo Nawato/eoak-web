@@ -13,18 +13,44 @@ interface MobileNavProps {
 export default function MobileNav({ links }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const activeValue = useActiveNav();
 
   useEffect(() => {
     if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        event.preventDefault();
         setOpen(false);
         buttonRef.current?.focus();
+        return;
+      }
+      if (event.key !== 'Tab' || !navRef.current) return;
+      const focusable = navRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     }
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    requestAnimationFrame(() => navRef.current?.querySelector<HTMLElement>('a, button')?.focus());
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [open]);
 
   return (
@@ -43,6 +69,7 @@ export default function MobileNav({ links }: MobileNavProps) {
 
       {open && (
         <nav
+          ref={navRef}
           id="mobile-nav"
           aria-label="Main"
           className="absolute inset-x-0 top-16 border-b border-white/5 bg-black/95 px-4 py-4 backdrop-blur-md"
