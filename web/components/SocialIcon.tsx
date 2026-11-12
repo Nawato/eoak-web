@@ -1,4 +1,19 @@
-import { siInstagram, siYoutube, siX, siFacebook, siTiktok } from 'simple-icons';
+import {
+  siInstagram,
+  siYoutube,
+  siX,
+  siFacebook,
+  siTiktok,
+  siSpotify,
+  siApplemusic,
+  siBandcamp,
+  siSoundcloud,
+  siBluesky,
+  siThreads,
+  siDiscord,
+  siPatreon,
+  siTwitch,
+} from 'simple-icons';
 import type { SocialPlatform } from '@/sanity/types';
 
 const icons = {
@@ -7,6 +22,15 @@ const icons = {
   twitter: siX,
   facebook: siFacebook,
   tiktok: siTiktok,
+  spotify: siSpotify,
+  applemusic: siApplemusic,
+  bandcamp: siBandcamp,
+  soundcloud: siSoundcloud,
+  bluesky: siBluesky,
+  threads: siThreads,
+  discord: siDiscord,
+  patreon: siPatreon,
+  twitch: siTwitch,
 } satisfies Record<SocialPlatform, { path: string }>;
 
 export default function SocialIcon({ platform, className }: { platform: SocialPlatform; className?: string }) {

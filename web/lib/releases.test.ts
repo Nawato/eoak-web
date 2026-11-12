@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatRelativeDate, splitReleases } from './releases';
+import {
+  formatReleaseDate,
+  formatRelativeDate,
+  latestReleaseHref,
+  releaseStartTimestamp,
+  releaseStatus,
+  splitReleases,
+} from './releases';
 import type { Release } from './sanity';
 
 const now = new Date('2026-10-31T15:00:00Z');
@@ -36,5 +43,34 @@ describe('releases', () => {
     expect(formatRelativeDate('2026-11-12', now)).toBe('in 12 days');
     expect(formatRelativeDate('2027-01-31', now)).toBe('in 3 months');
     expect(formatRelativeDate('2026-10-01', now)).toBe('4 weeks ago');
+  });
+
+  it('reports upcoming, released and unknown states', () => {
+    expect(releaseStatus(r('soon', '2026-11-13'), now)).toBe('upcoming');
+    expect(releaseStatus(r('today', '2026-10-31'), now)).toBe('released');
+    expect(releaseStatus(r('bad', 'not-a-date'), now)).toBe('unknown');
+  });
+
+  it('uses Berlin midnight for the countdown in winter and summer', () => {
+    expect(new Date(releaseStartTimestamp('2026-01-15')).toISOString()).toBe('2026-01-14T23:00:00.000Z');
+    expect(new Date(releaseStartTimestamp('2026-07-15')).toISOString()).toBe('2026-07-14T22:00:00.000Z');
+    expect(Number.isNaN(releaseStartTimestamp('2026-02-30'))).toBe(true);
+  });
+
+  it('links to the newest released release, falling back to the next upcoming one', () => {
+    const releases: Release[] = [
+      { _id: 'old', title: 'Old', slug: 'old', releaseDate: '2025-01-01' },
+      { _id: 'new', title: 'New', slug: 'new', releaseDate: '2026-10-01' },
+      { _id: 'soon', title: 'Soon', slug: 'soon', releaseDate: '2027-01-01' },
+      { _id: 'no-slug', title: 'No slug', releaseDate: '2026-12-01' },
+    ];
+    expect(latestReleaseHref(releases, now)).toBe('/releases/new');
+    expect(latestReleaseHref([releases[2]], now)).toBe('/releases/soon');
+    expect(latestReleaseHref([releases[3]], now)).toBeUndefined();
+  });
+
+  it('formats long release dates and rejects malformed values', () => {
+    expect(formatReleaseDate('2026-11-12')).toBe('12 November 2026');
+    expect(formatReleaseDate('2026-02-30')).toBe('');
   });
 });

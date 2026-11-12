@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import DesktopNav from '@/components/DesktopNav';
 import MobileNav from '@/components/MobileNav';
 import SocialIcon from '@/components/SocialIcon';
 import type { NavLink } from '@/lib/nav';
@@ -33,17 +34,7 @@ export default function Navbar({ bandName, socialLinks = [], logo, links }: Navb
           )}
         </Link>
 
-        <nav aria-label="Main" className="hidden items-center gap-4 xl:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-xs font-medium uppercase tracking-widest text-muted transition-colors hover:text-accent-text"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <DesktopNav links={links} />
 
         <div className="flex items-center gap-3">
           {socialLinks.map((link, index) => {

@@ -11,9 +11,22 @@ interface HeroProps {
   eyebrow?: string;
   tagline?: string;
   merchUrl?: string | null;
+  latestReleaseHref?: string;
+  showTourCta?: boolean;
 }
 
-export default function Hero({ bandName, logo, background, backgroundAlt, overlayOpacity, eyebrow, tagline, merchUrl }: HeroProps) {
+export default function Hero({
+  bandName,
+  logo,
+  background,
+  backgroundAlt,
+  overlayOpacity,
+  eyebrow,
+  tagline,
+  merchUrl,
+  latestReleaseHref = '#releases',
+  showTourCta = true,
+}: HeroProps) {
   const logoSource = getLogo(logo, 1200);
   const backgroundUrl = hasImage(background) ? getImageUrl(background, 2400) : undefined;
   const darkening = typeof overlayOpacity === 'number' && Number.isFinite(overlayOpacity)
@@ -65,17 +78,19 @@ export default function Hero({ bandName, logo, background, backgroundAlt, overla
 
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link
-            href="#music"
+            href={latestReleaseHref}
             className="rounded-sm bg-accent px-8 py-4 text-sm font-semibold uppercase tracking-widest text-white transition-colors hover:bg-accent-dark"
           >
             Latest Release
           </Link>
-          <Link
-            href="#shows"
-            className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
-          >
-            Tour Dates
-          </Link>
+          {showTourCta && (
+            <Link
+              href="#shows"
+              className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
+            >
+              Tour Dates
+            </Link>
+          )}
           {merchUrl && (
             <a
               href={merchUrl}

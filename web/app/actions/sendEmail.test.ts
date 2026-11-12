@@ -23,6 +23,7 @@ function contactForm(email = 'fan@example.com'): FormData {
   form.set('name', 'A Fan');
   form.set('email', email);
   form.set('message', 'Hello, I would like to book the band.');
+  form.set('privacyConsent', 'on');
   return form;
 }
 
@@ -41,7 +42,7 @@ describe('sendContactEmail', () => {
     vi.restoreAllMocks();
   });
 
-  it('sends to the single inbox with the visitor as reply-to, without an inquiry choice', async () => {
+  it('sends to the fallback inbox with the visitor as reply-to when no channel is selected', async () => {
     expect(await sendContactEmail(contactForm())).toEqual({ success: true });
     expect(send).toHaveBeenCalledWith(expect.objectContaining({
       from: 'End Of All Known <kontakt@endofallknown.de>',
@@ -71,6 +72,67 @@ describe('sendContactEmail', () => {
       to: 'new-inbox@example.com',
       replyTo: 'fan@example.com',
     }));
+  });
+
+  it('requires the privacy consent checkbox', async () => {
+    const form = contactForm();
+    form.delete('privacyConsent');
+    expect(await sendContactEmail(form)).toEqual({
+      success: false,
+      error: 'Please confirm the privacy notice before sending.',
+    });
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it('routes to an enabled, configured contact channel', async () => {
+    getSiteSettings.mockResolvedValue({
+      contactEmail: 'fallback@example.com',
+      contactChannels: [
+        { key: 'booking', label: 'Booking', email: 'booking@example.com', enabled: true, order: 1 },
+        { key: 'press', label: 'Press', email: 'press@example.com', enabled: true, order: 2 },
+      ],
+    });
+    const form = contactForm();
+    form.set('channel', 'press');
+    expect(await sendContactEmail(form)).toEqual({ success: true });
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({
+      to: 'press@example.com',
+      subject: expect.stringContaining('Press'),
+      text: expect.stringContaining('Topic: Press'),
+    }));
+  });
+
+  it('falls back to the single inbox when channel routing is disabled', async () => {
+    getSiteSettings.mockResolvedValue({
+      contactEmail: 'fallback@example.com',
+      features: { contactChannels: false },
+      contactChannels: [
+        { key: 'booking', label: 'Booking', email: 'booking@example.com', enabled: true, order: 1 },
+      ],
+    });
+    const form = contactForm();
+    form.set('channel', 'booking');
+    expect(await sendContactEmail(form)).toEqual({ success: true });
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({ to: 'fallback@example.com' }));
+  });
+
+  it('ignores unknown, disabled and malformed channel keys', async () => {
+    getSiteSettings.mockResolvedValue({
+      contactEmail: 'fallback@example.com',
+      contactChannels: [
+        { key: 'booking', label: 'Booking', email: 'booking@example.com', enabled: true, order: 1 },
+        { key: 'old', label: 'Old', email: 'old@example.com', enabled: false, order: 2 },
+        { key: 'evil', label: 'Evil', email: 'not-an-email', enabled: true, order: 3 },
+      ],
+    });
+    for (const channel of ['missing', 'old', 'evil']) {
+      const form = contactForm();
+      form.set('channel', channel);
+      expect(await sendContactEmail(form)).toEqual({ success: true });
+    }
+    for (const call of send.mock.calls) {
+      expect(call[0]).toEqual(expect.objectContaining({ to: 'fallback@example.com' }));
+    }
   });
 
   it.each(['', 'not-an-email', 'fan@example.com\r\nBcc: other@example.com'])(

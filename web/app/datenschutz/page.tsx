@@ -117,7 +117,25 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>5. Externe Medien und Einwilligung</h2>
+            <h2>5. Newsletter</h2>
+            <p>
+              Wenn Sie den Newsletter abonnieren, verarbeiten wir Ihre E-Mail-Adresse, um Ihnen die Anmeldung per
+              Bestätigungs-E-Mail zuzusenden und nach Ihrer Bestätigung den Newsletter zu versenden. Das Double-Opt-in
+              schützt vor missbräuchlichen Anmeldungen. Rechtsgrundlage ist Ihre Einwilligung nach Art. 6 Abs. 1 lit. a
+              DSGVO; Sie können sie jederzeit über den Abmeldelink im Newsletter oder per E-Mail an uns widerrufen.
+            </p>
+            <p>
+              Der Versand und die Verwaltung der Empfängerliste erfolgen über Resend (Plus Five Five, Inc., USA).
+              Dabei werden Ihre E-Mail-Adresse und technische Versanddaten an den Dienst übermittelt. Die Website
+              speichert keine eigene Newsletter-Datenbank. Bestätigungslinks sind 48 Stunden gültig. Zur
+              Missbrauchsabwehr wird, sofern vom Host übermittelt, die IP-Adresse vorübergehend im Arbeitsspeicher
+              verarbeitet und Anmeldungen werden auf drei Anfragen innerhalb von zehn Minuten begrenzt
+              (Art. 6 Abs. 1 lit. f DSGVO).
+            </p>
+          </section>
+
+          <section id="consent">
+            <h2>6. Externe Medien und Einwilligung</h2>
             <p>
               YouTube, Spotify, Instagram-Fotos und Bandsintown werden erst nach Ihrer freiwilligen,
               anbieterspezifischen Einwilligung geladen. Ohne Einwilligung können Sie die übrige Website nutzen.
@@ -173,7 +191,7 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>6. Externe Links</h2>
+            <h2>7. Externe Links</h2>
             <p>
               Social-Media-Profile, Merch-Shop, Ticketseiten und das externe Pressekit (z. B. Google Drive) sind normale
               Links. Erst beim Öffnen verlassen Sie unsere Website und es gelten die Hinweise des jeweiligen Betreibers.
@@ -182,7 +200,7 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>7. Empfänger und Übermittlungen außerhalb des EWR</h2>
+            <h2>8. Empfänger und Übermittlungen außerhalb des EWR</h2>
             <p>
               Empfänger sind die oben genannten Hosting-, Inhalts-, Versand- und Postfachdienstleister sowie nach Ihrer
               Einwilligung die Medienanbieter. Soweit Dienstleister in unserem Auftrag handeln, ist ein Vertrag nach
@@ -200,7 +218,7 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>8. Ihre Rechte</h2>
+            <h2>9. Ihre Rechte</h2>
             <p>
               Unter den jeweiligen gesetzlichen Voraussetzungen haben Sie das Recht auf Auskunft (Art. 15), Berichtigung
               (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18) und Datenübertragbarkeit (Art. 20 DSGVO).
@@ -225,7 +243,7 @@ export default async function DatenschutzPage() {
           </section>
 
           <section>
-            <h2>9. Automatisierte Entscheidungen und Änderungen</h2>
+            <h2>10. Automatisierte Entscheidungen und Änderungen</h2>
             <p>
               Wir nutzen auf dieser Website keine automatisierten Entscheidungen mit rechtlicher oder ähnlich
               erheblicher Wirkung im Sinne von Art. 22 DSGVO. Eigenständige Verarbeitungen externer Medienanbieter sind

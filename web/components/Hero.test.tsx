@@ -37,4 +37,24 @@ describe('hero photo overlay', () => {
     }));
     expect(html).toContain('style="opacity:1"');
   });
+
+  it('links the primary CTA to the latest release with a section fallback', () => {
+    const latest = renderToStaticMarkup(createElement(Hero, {
+      bandName: 'End Of All Known',
+      latestReleaseHref: '/releases/new-album',
+    }));
+    expect(latest).toContain('href="/releases/new-album"');
+    expect(latest).toContain('Latest Release');
+
+    const fallback = renderToStaticMarkup(createElement(Hero, { bandName: 'End Of All Known' }));
+    expect(fallback).toContain('href="#releases"');
+  });
+
+  it('hides the tour CTA when the section is disabled', () => {
+    const html = renderToStaticMarkup(createElement(Hero, {
+      bandName: 'End Of All Known',
+      showTourCta: false,
+    }));
+    expect(html).not.toContain('href="#shows"');
+  });
 });

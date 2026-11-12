@@ -1,14 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState, useTransition, type FormEvent } from 'react';
 import { sendContactEmail } from '@/app/actions/sendEmail';
 import { cn } from '@/lib/utils';
 
 interface ContactFormProps {
   className?: string;
+  channels?: { key: string; label: string }[];
 }
 
-export default function ContactForm({ className }: ContactFormProps) {
+export default function ContactForm({ className, channels = [] }: ContactFormProps) {
   const [isPending, startTransition] = useTransition();
   const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
 
@@ -33,12 +35,33 @@ export default function ContactForm({ className }: ContactFormProps) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className={cn('mt-12 space-y-6', className)}>
+      {channels.length > 0 && (
+        <div>
+          <label htmlFor="contact-channel" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
+            Topic
+          </label>
+          <select
+            id="contact-channel"
+            name="channel"
+            defaultValue=""
+            className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground transition-colors focus:border-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <option value="">General inquiry</option>
+            {channels.map((channel) => (
+              <option key={channel.key} value={channel.key}>
+                {channel.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div>
-        <label htmlFor="name" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
+        <label htmlFor="contact-name" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
           Name
         </label>
         <input
-          id="name"
+          id="contact-name"
           name="name"
           type="text"
           autoComplete="name"
@@ -50,30 +73,30 @@ export default function ContactForm({ className }: ContactFormProps) {
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
+        <label htmlFor="contact-email" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
           Your email address
         </label>
         <input
-          id="email"
+          id="contact-email"
           name="email"
           type="email"
           autoComplete="email"
-          aria-describedby="email-help"
+          aria-describedby="contact-email-help"
           required
           maxLength={254}
           className="w-full rounded-sm border border-white/10 bg-zinc-800 px-4 py-3 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-colors focus:border-accent"
         />
-        <p id="email-help" className="mt-2 text-sm text-muted">
+        <p id="contact-email-help" className="mt-2 text-sm text-muted">
           Enter your own email address so we can reply to you.
         </p>
       </div>
 
       <div>
-        <label htmlFor="message" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
+        <label htmlFor="contact-message" className="mb-2 block text-xs font-semibold uppercase tracking-widest text-zinc-400">
           Message
         </label>
         <textarea
-          id="message"
+          id="contact-message"
           name="message"
           required
           minLength={10}
@@ -83,9 +106,26 @@ export default function ContactForm({ className }: ContactFormProps) {
         />
       </div>
 
+      <div className="flex items-start gap-3 text-sm text-zinc-400">
+        <input
+          id="contact-consent"
+          name="privacyConsent"
+          type="checkbox"
+          required
+          className="mt-1 h-4 w-4 shrink-0 rounded-sm border-white/20 bg-zinc-800 accent-accent"
+        />
+        <label htmlFor="contact-consent">
+          I have read the{' '}
+          <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-rose-300">
+            privacy policy
+          </Link>{' '}
+          and agree that my details may be processed to answer this inquiry.
+        </label>
+      </div>
+
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-        <label htmlFor="website">Leave this field empty</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+        <label htmlFor="contact-website">Leave this field empty</label>
+        <input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
       </div>
 
       <button

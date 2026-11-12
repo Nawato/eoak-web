@@ -63,7 +63,7 @@ async function redirect(request: NextRequest, { params }: Params, count: boolean
   let link: ReleaseLink | null;
   try {
     link = await client.fetch<ReleaseLink | null>(
-      `*[_type == "release" && _id == $id][0].links[_key == $key][0]{url, clicks, uniqueClicks}`,
+      `*[_type == "release" && enabled != false && _id == $id][0].links[_key == $key][0]{url, clicks, uniqueClicks}`,
       { id, key },
       lookupOptions,
     );

@@ -72,10 +72,11 @@ describe('Instagram feed API', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('checks navigation visibility without fetching the feed or hiding configuration errors', () => {
+  it('requires both the token and the user ID for navigation visibility', () => {
     expect(hasInstagramConfiguration()).toBe(true);
     vi.stubEnv('INSTAGRAM_ACCESS_TOKEN', '');
-    expect(hasInstagramConfiguration()).toBe(true);
+    expect(hasInstagramConfiguration()).toBe(false);
+    vi.stubEnv('INSTAGRAM_ACCESS_TOKEN', 'secret-test-token');
     vi.stubEnv('INSTAGRAM_USER_ID', ' ');
     expect(hasInstagramConfiguration()).toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();

@@ -22,6 +22,52 @@ describe('content-aware navigation', () => {
       false,
     );
   });
+  it('adds tour, gallery and press links only when enabled and configured', () => {
+    const links = getNavLinks({
+      hasReleases: false,
+      hasMembers: false,
+      hasShows: true,
+      hasPhotos: true,
+      features: { galleryPage: true, photoGallery: true, tourArchive: true, pressLink: true },
+      pressUrl: 'https://drive.google.com/drive/folders/example',
+      pressLabel: 'Press folder',
+      pressDescription: 'Logos, photos and riders',
+    });
+    expect(links.find((link) => link.href === '/tour')).toBeTruthy();
+    expect(links.find((link) => link.href === '/gallery')).toBeTruthy();
+    expect(links.find((link) => link.label === 'Press folder')).toEqual(
+      expect.objectContaining({
+        href: 'https://drive.google.com/drive/folders/example',
+        title: 'Logos, photos and riders',
+        external: true,
+      }),
+    );
+  });
+
+  it('never links to disabled, unsafe or empty sections', () => {
+    const links = getNavLinks({
+      hasReleases: true,
+      hasMembers: true,
+      hasShows: false,
+      hasPhotos: false,
+      hasVideos: false,
+      hasInstagram: false,
+      features: {
+        musicSection: false,
+        releasesSection: false,
+        releasesArchive: false,
+        tourSection: false,
+        bioSection: false,
+        bandSection: false,
+        galleryPage: false,
+        contactSection: false,
+        pressLink: true,
+      },
+      pressUrl: 'javascript:alert(1)',
+    });
+    expect(links).toEqual([]);
+  });
+
   it.each([
     [false, false],
     [true, false],

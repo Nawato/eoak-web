@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getSiteSettings, getNavigationContent } from '@/lib/sanity';
 import { getNavLinks } from '@/lib/nav';
+import { resolveFeatures } from '@/lib/features';
 import { hasInstagramConfiguration } from '@/lib/instagram';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
@@ -61,10 +62,15 @@ export default async function RootLayout({
     getSiteSettings(),
     getNavigationContent(),
   ]);
+  const features = resolveFeatures(settings?.features);
   const links = getNavLinks({
     ...navigation,
+    features,
     hasInstagram: hasInstagramConfiguration(),
     instagramHeading: settings?.instagramHeading,
+    pressUrl: settings?.pressUrl,
+    pressLabel: settings?.pressLabel,
+    pressDescription: settings?.pressDescription,
   });
   const bandName = settings?.bandName ?? 'End Of All Known';
 
@@ -91,6 +97,10 @@ export default async function RootLayout({
           socialLinks={settings?.socialLinks ?? []}
           creditsHeading={settings?.creditsHeading}
           photoCredits={settings?.photoCredits}
+          pressUrl={features.pressLink ? settings?.pressUrl : null}
+          pressLabel={settings?.pressLabel}
+          pressDescription={settings?.pressDescription}
+          showPrivacySettings={features.privacySettingsLink}
         />
       </body>
     </html>

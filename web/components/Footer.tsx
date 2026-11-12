@@ -8,11 +8,25 @@ interface FooterProps {
   socialLinks?: SocialLink[];
   creditsHeading?: string | null;
   photoCredits?: PhotoCredit[] | null;
+  pressUrl?: string | null;
+  pressLabel?: string | null;
+  pressDescription?: string | null;
+  showPrivacySettings?: boolean;
 }
 
-export default function Footer({ bandName, socialLinks = [], creditsHeading, photoCredits }: FooterProps) {
+export default function Footer({
+  bandName,
+  socialLinks = [],
+  creditsHeading,
+  photoCredits,
+  pressUrl,
+  pressLabel,
+  pressDescription,
+  showPrivacySettings = false,
+}: FooterProps) {
   const year = new Date().getFullYear();
   const credits = (photoCredits ?? []).filter((credit) => credit.name?.trim());
+  const pressHref = toHttpsUrl(pressUrl);
 
   return (
     <footer className="border-t border-white/5 bg-black/40">
@@ -70,13 +84,29 @@ export default function Footer({ bandName, socialLinks = [], creditsHeading, pho
           })}
         </div>
 
-        <nav aria-label="Legal" className="flex items-center gap-6 text-xs">
+        <nav aria-label="Legal" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs">
+          {pressHref && (
+            <a
+              href={pressHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={pressDescription?.trim() || undefined}
+              className="text-muted transition-colors hover:text-accent-text"
+            >
+              {pressLabel?.trim() || 'Press / EPK'}
+            </a>
+          )}
           <Link href="/impressum" className="text-muted transition-colors hover:text-accent-text">
             Impressum
           </Link>
           <Link href="/datenschutz" className="text-muted transition-colors hover:text-accent-text">
             Datenschutz
           </Link>
+          {showPrivacySettings && (
+            <Link href="/datenschutz#consent" className="text-muted transition-colors hover:text-accent-text">
+              Privacy settings
+            </Link>
+          )}
         </nav>
       </div>
     </footer>

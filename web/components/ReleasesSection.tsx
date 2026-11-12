@@ -2,15 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { getHttpsLinks } from '@/lib/embeds';
-import { formatRelativeDate, splitReleases } from '@/lib/releases';
+import { formatRelativeDate, formatReleaseDate, splitReleases } from '@/lib/releases';
 import type { Release } from '@/lib/sanity';
-
-const dateFormat = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
-
-function formatDate(value: string): string {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? '' : dateFormat.format(date);
-}
 
 function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; upcoming: boolean }) {
   const coverUrl = hasImage(release.cover) ? getImageUrl(release.cover, 800, 800) : undefined;
@@ -50,7 +43,7 @@ function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; 
           {[release.releaseType, relative].filter(Boolean).join(' · ')}
         </p>
         <h3 className="mt-2 font-display text-2xl font-semibold uppercase text-white">{title}</h3>
-        <p className="mt-1 text-xs uppercase tracking-widest text-zinc-400">{formatDate(release.releaseDate)}</p>
+        <p className="mt-1 text-xs uppercase tracking-widest text-zinc-400">{formatReleaseDate(release.releaseDate)}</p>
         {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map((link) => (
@@ -71,7 +64,15 @@ function ReleaseCard({ release, now, upcoming }: { release: Release; now: Date; 
   );
 }
 
-export default function ReleasesSection({ releases, now = new Date() }: { releases: Release[]; now?: Date }) {
+export default function ReleasesSection({
+  releases,
+  now = new Date(),
+  archiveHref,
+}: {
+  releases: Release[];
+  now?: Date;
+  archiveHref?: string;
+}) {
   if (releases.length === 0) return null;
   const { upcoming, released } = splitReleases(releases, now);
   if (upcoming.length + released.length === 0) return null;
@@ -88,6 +89,16 @@ export default function ReleasesSection({ releases, now = new Date() }: { releas
             <ReleaseCard key={release._id} release={release} now={now} upcoming={false} />
           ))}
         </div>
+        {archiveHref && (
+          <p className="mt-10 text-center">
+            <Link
+              href={archiveHref}
+              className="text-sm text-muted underline underline-offset-4 transition-colors hover:text-white"
+            >
+              View all releases
+            </Link>
+          </p>
+        )}
       </div>
     </section>
   );

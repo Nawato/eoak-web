@@ -46,3 +46,30 @@ describe('photographer credits', () => {
     expect(renderCredits([{ _key: 'blank', name: '  ' }])).not.toContain('photo-credits-heading');
   });
 });
+
+describe('press link', () => {
+  it('renders an enabled HTTPS press link with its description', () => {
+    const html = renderToStaticMarkup(createElement(Footer, {
+      bandName: 'End Of All Known',
+      pressUrl: 'https://drive.example.com/press',
+      pressLabel: 'Press folder',
+      pressDescription: 'Logos, photos and riders',
+    }));
+    expect(html).toContain('href="https://drive.example.com/press"');
+    expect(html).toContain('title="Logos, photos and riders"');
+    expect(html).toContain('Press folder');
+  });
+
+  it.each([undefined, null, '', 'http://example.com/press', 'javascript:alert(1)'])(
+    'hides an absent or unsafe press URL: %s',
+    (pressUrl) => {
+      const html = renderToStaticMarkup(createElement(Footer, {
+        bandName: 'End Of All Known',
+        pressUrl,
+        pressLabel: 'Press folder',
+      }));
+      expect(html).not.toContain('Press folder');
+      expect(html).not.toContain('javascript:');
+    },
+  );
+});

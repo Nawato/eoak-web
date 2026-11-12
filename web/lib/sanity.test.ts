@@ -22,10 +22,39 @@ describe('Sanity content freshness', () => {
     await getNavigationContent();
     expect(fetch).toHaveBeenCalledOnce();
     const query = fetch.mock.calls[0][0];
-    expect(query).toContain('"hasReleases": defined(*[_type == "release"][0]._id)');
-    expect(query).toContain('"hasMembers": defined(*[_type == "member"][0]._id)');
+    expect(query).toContain('"hasReleases": defined(*[_type == "release" && enabled != false][0]._id)');
+    expect(query).toContain('"hasMembers": defined(*[_type == "member" && enabled != false][0]._id)');
+    expect(query).toContain('"hasShows": defined(*[_type == "show" && enabled != false][0]._id)');
     expect(query).not.toContain('cover');
   });
+  it('filters disabled releases, members, shows, photos and videos from public queries', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
+    vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');
+    const {
+      getReleases,
+      getArchiveReleases,
+      getRelease,
+      getReleaseSlugs,
+      getMembers,
+      getShows,
+      getPhotos,
+      getVideos,
+    } = await import('./sanity');
+    await Promise.all([
+      getReleases(),
+      getArchiveReleases(),
+      getRelease('example'),
+      getReleaseSlugs(),
+      getMembers(),
+      getShows(),
+      getPhotos(),
+      getVideos(),
+    ]);
+    for (const call of fetch.mock.calls) {
+      expect(call[0]).toContain('enabled != false');
+    }
+  });
+
   it('uses a parameterized single-release query and an uncapped slug query', async () => {
     vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
     vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');

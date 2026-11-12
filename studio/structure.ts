@@ -15,4 +15,7 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
       S.documentTypeListItem('release').title('Releases'),
       S.documentTypeListItem('member').title('Band Members'),
+      S.documentTypeListItem('show').title('Tour Dates'),
+      S.documentTypeListItem('photo').title('Gallery Photos'),
+      S.documentTypeListItem('video').title('Gallery Videos'),
     ]);

@@ -16,7 +16,8 @@ export interface InstagramFeed {
 }
 
 export function hasInstagramConfiguration(): boolean {
-  return Boolean(process.env.INSTAGRAM_ACCESS_TOKEN?.trim() || process.env.INSTAGRAM_USER_ID?.trim());
+  // Both halves are required: a token alone (or an ID alone) cannot render a feed.
+  return Boolean(process.env.INSTAGRAM_ACCESS_TOKEN?.trim() && process.env.INSTAGRAM_USER_ID?.trim());
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

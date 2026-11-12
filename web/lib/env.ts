@@ -43,4 +43,5 @@ export function validateServerEnv(): void {
     'SESSION_SECRET / RELEASE_CLICK_CLEANUP_SECRET',
     optionalEnv('SESSION_SECRET') ?? optionalEnv('RELEASE_CLICK_CLEANUP_SECRET'),
   );
+  assertSecret('NEWSLETTER_SIGNING_SECRET', optionalEnv('NEWSLETTER_SIGNING_SECRET'));
 }

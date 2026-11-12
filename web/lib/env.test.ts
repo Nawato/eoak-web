@@ -45,4 +45,14 @@ describe('server environment validation', () => {
     const { validateServerEnv } = await import('./env');
     expect(() => validateServerEnv()).not.toThrow();
   });
+
+  it('rejects a short newsletter signing secret in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://example.com');
+    vi.stubEnv('NEXT_PUBLIC_SANITY_PROJECT_ID', 'example');
+    vi.stubEnv('NEXT_PUBLIC_SANITY_DATASET', 'production');
+    vi.stubEnv('NEWSLETTER_SIGNING_SECRET', 'too-short');
+    const { validateServerEnv } = await import('./env');
+    expect(() => validateServerEnv()).toThrow(/NEWSLETTER_SIGNING_SECRET/);
+  });
 });
