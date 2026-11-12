@@ -3,19 +3,17 @@
 import { headers } from 'next/headers';
 import { Resend } from 'resend';
 import { getTrustedClientIp } from '@/lib/client-ip';
-import { createRateLimiter } from '@/lib/rate-limit';
+import {
+  isFormSubmissionRateLimited,
+  newsletterIpRateLimiter,
+  newsletterSharedRateLimiter,
+} from '@/lib/form-rate-limit';
 import { defaultContactEmail, siteUrl } from '@/lib/site';
 import {
   isValidNewsletterEmail,
   normalizeNewsletterEmail,
   signNewsletterToken,
 } from '@/lib/newsletter';
-
-const isRateLimited = createRateLimiter({
-  windowMs: 10 * 60 * 1000,
-  max: 3,
-  maxClients: 1000,
-});
 
 export interface SubscribeToNewsletterResult {
   success: boolean;
@@ -61,7 +59,7 @@ export async function subscribeToNewsletter(formData: FormData): Promise<Subscri
 
   const requestHeaders = await headers();
   const clientIp = getTrustedClientIp(requestHeaders, process.env.RELEASE_CLICK_IP_HEADER);
-  if (clientIp && isRateLimited(clientIp)) {
+  if (isFormSubmissionRateLimited(clientIp, newsletterIpRateLimiter, newsletterSharedRateLimiter)) {
     return { success: false, error: 'Too many requests. Please try again later.' };
   }
 

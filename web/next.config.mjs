@@ -1,5 +1,12 @@
 const isDev = process.env.NODE_ENV !== 'production';
 
+// Development-only: hostnames (without scheme/port) allowed to request dev
+// assets and HMR when the dev server is opened from another device or tunnel.
+const allowedDevOrigins = (process.env.ALLOWED_DEV_ORIGINS ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval' " : ''}https://widget.bandsintown.com https://rest.bandsintown.com`,
@@ -28,6 +35,7 @@ const securityHeaders = [
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  allowedDevOrigins,
   poweredByHeader: false,
   images: {
     remotePatterns: [

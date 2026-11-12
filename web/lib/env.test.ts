@@ -26,6 +26,18 @@ describe('server environment validation', () => {
     await expect(import('./env')).rejects.toThrow(/NEXT_PUBLIC_SITE_URL/);
   });
 
+  it('refuses a non-HTTPS site URL in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://example.com');
+    await expect(import('./env')).rejects.toThrow(/HTTPS/);
+  });
+
+  it('refuses an invalid site URL in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'not-a-url');
+    await expect(import('./env')).rejects.toThrow(/valid absolute URL/);
+  });
+
   it('rejects a short hash secret in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://example.com');

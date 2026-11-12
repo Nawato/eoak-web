@@ -4,6 +4,13 @@ export interface RateLimiterOptions {
   maxClients?: number;
 }
 
+export interface RateLimiter {
+  /** Records a hit and returns true when the caller should be throttled. */
+  (key: string): boolean;
+  /** Clears all retained clients. Intended for tests. */
+  reset(): void;
+}
+
 /**
  * Best-effort per-process rate limiting. Use a shared store (e.g. Upstash) for
  * strict enforcement across instances. The returned function records a hit and
@@ -13,10 +20,10 @@ export function createRateLimiter({
   windowMs,
   max,
   maxClients = 1000,
-}: RateLimiterOptions): (key: string) => boolean {
+}: RateLimiterOptions): RateLimiter {
   const submissions = new Map<string, number[]>();
 
-  return function isRateLimited(key: string): boolean {
+  const isRateLimited = ((key: string): boolean => {
     const now = Date.now();
     for (const [client, times] of submissions) {
       if (times.every((time) => now - time >= windowMs)) submissions.delete(client);
@@ -30,5 +37,9 @@ export function createRateLimiter({
     recent.push(now);
     submissions.set(key, recent);
     return false;
-  };
+  }) as RateLimiter;
+
+  isRateLimited.reset = () => submissions.clear();
+
+  return isRateLimited;
 }

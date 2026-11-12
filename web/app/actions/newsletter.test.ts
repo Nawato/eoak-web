@@ -12,6 +12,7 @@ vi.mock('resend', () => ({
 }));
 vi.mock('next/headers', () => ({ headers }));
 
+import { newsletterIpRateLimiter, newsletterSharedRateLimiter } from '@/lib/form-rate-limit';
 import { subscribeToNewsletter } from './newsletter';
 
 function newsletterForm(email = 'fan@example.com'): FormData {
@@ -24,6 +25,8 @@ function newsletterForm(email = 'fan@example.com'): FormData {
 describe('subscribeToNewsletter', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    newsletterIpRateLimiter.reset();
+    newsletterSharedRateLimiter.reset();
     vi.stubEnv('RESEND_API_KEY', 'test-key');
     vi.stubEnv('RESEND_AUDIENCE_ID', 'audience-id');
     vi.stubEnv('NEWSLETTER_SIGNING_SECRET', 'test-newsletter-secret-with-enough-entropy');
@@ -87,6 +90,23 @@ describe('subscribeToNewsletter', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     expect((await subscribeToNewsletter(newsletterForm())).success).toBe(false);
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it('applies a shared fallback limit when no trusted IP is configured', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-11-12T12:00:00Z'));
+      vi.stubEnv('RELEASE_CLICK_IP_HEADER', '');
+      headers.mockResolvedValue(new Headers({ 'x-forwarded-for': '198.51.100.9' }));
+      for (let index = 0; index < 30; index++) {
+        expect((await subscribeToNewsletter(newsletterForm())).success).toBe(true);
+      }
+      expect((await subscribeToNewsletter(newsletterForm())).error).toContain('Too many requests');
+      vi.advanceTimersByTime(10 * 60 * 1000);
+      expect((await subscribeToNewsletter(newsletterForm())).success).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('rate limits per trusted client IP', async () => {

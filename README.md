@@ -38,7 +38,7 @@ Use `web/.env.local` locally and your hosting provider's environment settings in
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` | Required Sanity connection |
-| `NEXT_PUBLIC_SITE_URL` | Public origin for canonical URLs, sitemap and sharing; required in production |
+| `NEXT_PUBLIC_SITE_URL` | Public origin for canonical URLs, sitemap, sharing and newsletter links; required in production and must be an absolute HTTPS URL |
 | `SANITY_API_READ_TOKEN` | Optional read token for private datasets; the website serves published content only |
 | `SANITY_API_WRITE_TOKEN` | Release click counting; use the least privileges your Sanity plan supports |
 | `SANITY_REVALIDATE_SECRET` | Signed content-revalidation webhook |
@@ -122,7 +122,7 @@ The optional **Bandsintown Link** changes the fallback button, not the widget's 
 
 The newsletter section defaults to off. Enable it under **Features & Sections** and choose one of two modes:
 
-1. **Native double opt-in** requires `RESEND_API_KEY`, `RESEND_AUDIENCE_ID` and a signing secret (`NEWSLETTER_SIGNING_SECRET`, or `SESSION_SECRET` as fallback). The form sends a confirmation email with a signed 48-hour token. Only after `/api/newsletter/confirm` succeeds is the address added to the Resend Audience. The confirmation endpoint is idempotent, and submission includes a honeypot, consent checkbox and per-IP rate limiting.
+1. **Native double opt-in** requires `RESEND_API_KEY`, `RESEND_AUDIENCE_ID` and a signing secret (`NEWSLETTER_SIGNING_SECRET`, or `SESSION_SECRET` as fallback). The form sends a confirmation email with a signed 48-hour token. The link opens a page with an explicit **Confirm subscription** button; only the resulting POST to `/api/newsletter/confirm` adds the address to the Resend Audience, so mail scanners and link previews cannot confirm it. The endpoint is idempotent, and submission includes a honeypot, consent checkbox and rate limiting.
 2. **External signup URL** is used when the native configuration is incomplete. The section links to the HTTPS URL instead of collecting addresses itself.
 
 Without either configuration the section stays hidden. Raw email addresses are never logged. Configure a verified Resend sender domain and create an Audience before enabling native mode. Newsletter copy, button label, success message and privacy note are editable.
@@ -131,7 +131,7 @@ Without either configuration the section stays hidden. Raw email addresses are n
 
 YouTube, Spotify, Bandsintown and Instagram media load only after visitor consent. Consent can be revoked on each media block or on `/datenschutz`. When browser storage is blocked, the choice lasts until reload.
 
-Contact submissions are routed by the selected topic to an enabled **Contact Channel**, or fall back to **Site Settings → Contact Email**, defaulting to `kontakt@endofallknown.de`. Unknown, disabled or invalid channel keys safely use the fallback. Channels support stable keys, labels, addresses, descriptions and ordering. The visitor's email is used as **Reply-To**, never as the sender. Delivery requires a verified Resend sender domain. The contact section, form and channel cards have separate feature flags; the form includes a privacy consent checkbox linking to `/datenschutz#consent`. Honeypot and per-process rate limiting provide basic spam protection, not distributed enforcement.
+Contact submissions are routed by the selected topic to an enabled **Contact Channel**, or fall back to **Site Settings → Contact Email**, defaulting to `kontakt@endofallknown.de`. Unknown, disabled or invalid channel keys safely use the fallback. Channels support stable keys, labels, addresses, descriptions and ordering. The visitor's email is used as **Reply-To**, never as the sender. Delivery requires a verified Resend sender domain. The contact section, form and channel cards have separate feature flags; the form includes a privacy consent checkbox linking to `/datenschutz#consent`. Honeypot and per-process rate limiting provide basic spam protection, not distributed enforcement. When `RELEASE_CLICK_IP_HEADER` is not configured (or the header is missing/invalid), submissions still fall back to a conservative shared limit instead of being unlimited.
 
 ## Release click statistics
 

@@ -12,12 +12,20 @@ vi.mock('resend', () => ({
 }));
 
 import { signNewsletterToken } from '@/lib/newsletter';
-import { GET } from './route';
+import { GET, POST } from './route';
 
 const secret = 'test-newsletter-secret-with-enough-entropy';
 
-function request(token: string) {
+function getRequest(token: string) {
   return new Request(`https://band.example/api/newsletter/confirm?token=${encodeURIComponent(token)}`);
+}
+
+function postRequest(token: string) {
+  return new Request('https://band.example/api/newsletter/confirm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ token }).toString(),
+  });
 }
 
 describe('newsletter confirmation route', () => {
@@ -35,15 +43,26 @@ describe('newsletter confirmation route', () => {
     vi.restoreAllMocks();
   });
 
-  it('rejects invalid tokens', async () => {
-    const response = await GET(request('not-a-token'));
+  it('rejects invalid tokens on GET', async () => {
+    const response = await GET(getRequest('not-a-token'));
     expect(response.status).toBe(400);
     expect(create).not.toHaveBeenCalled();
   });
 
-  it('adds the verified contact to the audience', async () => {
+  it('renders a POST confirmation form without subscribing', async () => {
     const token = signNewsletterToken('fan@example.com', { secret })!;
-    const response = await GET(request(token));
+    const response = await GET(getRequest(token));
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    expect(html).toContain('method="post"');
+    expect(html).toContain('name="token"');
+    expect(html).toContain(token);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('adds the verified contact to the audience on POST', async () => {
+    const token = signNewsletterToken('fan@example.com', { secret })!;
+    const response = await POST(postRequest(token));
     expect(response.status).toBe(200);
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       audienceId: 'audience-id',
@@ -58,16 +77,22 @@ describe('newsletter confirmation route', () => {
       error: { name: 'validation_error', statusCode: 422, message: 'Contact already exists' },
     });
     const token = signNewsletterToken('fan@example.com', { secret })!;
-    const response = await GET(request(token));
+    const response = await POST(postRequest(token));
     expect(response.status).toBe(200);
     expect(get).toHaveBeenCalledWith({ audienceId: 'audience-id', email: 'fan@example.com' });
+  });
+
+  it('rejects a missing or invalid POST token', async () => {
+    expect((await POST(postRequest(''))).status).toBe(400);
+    expect((await POST(postRequest('not-a-token'))).status).toBe(400);
+    expect(create).not.toHaveBeenCalled();
   });
 
   it('returns a service error when configuration is missing', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.stubEnv('RESEND_API_KEY', '');
     const token = signNewsletterToken('fan@example.com', { secret })!;
-    expect((await GET(request(token))).status).toBe(503);
+    expect((await POST(postRequest(token))).status).toBe(503);
     expect(create).not.toHaveBeenCalled();
   });
 });

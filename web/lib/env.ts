@@ -14,11 +14,32 @@ export function requiredEnv(name: string): string {
   return value;
 }
 
+function assertProductionSiteUrl(value: string): void {
+  if (process.env.NODE_ENV !== 'production') return;
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error(
+      'NEXT_PUBLIC_SITE_URL must be a valid absolute URL in production (e.g. https://example.com).',
+    );
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new Error(
+      'NEXT_PUBLIC_SITE_URL must use HTTPS in production so confirmation links and canonical URLs are not sent over plaintext.',
+    );
+  }
+}
+
 // Public origin without a trailing slash. Fails fast in production instead of
 // silently emitting localhost canonical, Open Graph and sitemap URLs.
 export const siteUrl = (() => {
   const configured = optionalEnv('NEXT_PUBLIC_SITE_URL');
-  if (configured) return configured.replace(/\/$/, '');
+  if (configured) {
+    const normalized = configured.replace(/\/$/, '');
+    assertProductionSiteUrl(normalized);
+    return normalized;
+  }
   if (process.env.NODE_ENV === 'production') {
     throw new Error(
       'NEXT_PUBLIC_SITE_URL is required in production (e.g. https://example.com). Refusing to fall back to localhost.',

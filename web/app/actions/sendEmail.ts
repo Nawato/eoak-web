@@ -6,18 +6,16 @@ import { getSiteSettings } from '@/lib/sanity';
 import { resolveFeatures } from '@/lib/features';
 import { defaultContactEmail } from '@/lib/site';
 import { getTrustedClientIp } from '@/lib/client-ip';
-import { createRateLimiter } from '@/lib/rate-limit';
+import {
+  contactIpRateLimiter,
+  contactSharedRateLimiter,
+  isFormSubmissionRateLimited,
+} from '@/lib/form-rate-limit';
 import { getContactChannelByKey, getEnabledContactChannels, isValidContactEmail } from '@/lib/contact';
 
 const MAX_NAME = 100;
 const MAX_EMAIL = 254;
 const MAX_MESSAGE = 5000;
-
-const isRateLimited = createRateLimiter({
-  windowMs: 10 * 60 * 1000,
-  max: 3,
-  maxClients: 1000,
-});
 
 function escapeHtml(value: string): string {
   return value
@@ -74,9 +72,10 @@ export async function sendContactEmail(formData: FormData): Promise<SendContactE
 
   const requestHeaders = await headers();
   // Only trust a header that the hosting proxy is configured to overwrite (shared with /go).
-  // Without one we skip the per-client limit instead of throttling every visitor together.
+  // When no trusted IP is available, fall back to a conservative shared limit instead of
+  // disabling throttling entirely.
   const clientIp = getTrustedClientIp(requestHeaders, process.env.RELEASE_CLICK_IP_HEADER);
-  if (clientIp && isRateLimited(clientIp)) {
+  if (isFormSubmissionRateLimited(clientIp, contactIpRateLimiter, contactSharedRateLimiter)) {
     return { success: false, error: 'Too many messages. Please try again later.' };
   }
 

@@ -16,6 +16,7 @@ vi.mock('@/lib/sanity', () => ({ getSiteSettings }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/lib/site', async () => import('../../lib/site'));
 
+import { contactIpRateLimiter, contactSharedRateLimiter } from '@/lib/form-rate-limit';
 import { sendContactEmail } from './sendEmail';
 
 function contactForm(email = 'fan@example.com'): FormData {
@@ -30,6 +31,8 @@ function contactForm(email = 'fan@example.com'): FormData {
 describe('sendContactEmail', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    contactIpRateLimiter.reset();
+    contactSharedRateLimiter.reset();
     vi.stubEnv('RESEND_API_KEY', 'test-key');
     vi.stubEnv('CONTACT_FROM_EMAIL', 'kontakt@endofallknown.de');
     headers.mockResolvedValue(new Headers());
@@ -195,20 +198,40 @@ describe('sendContactEmail', () => {
     } finally { vi.useRealTimers(); }
   });
 
-  it('ignores forwarded headers when no trusted header is configured', async () => {
-    vi.stubEnv('RELEASE_CLICK_IP_HEADER', '');
-    headers.mockResolvedValue(new Headers({
-      'x-real-ip': '198.51.100.7',
-      'x-vercel-forwarded-for': '198.51.100.7',
-      'x-forwarded-for': '198.51.100.7',
-    }));
-    for (let index = 0; index < 5; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
+  it('applies a shared fallback limit when no trusted header is configured', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-11-12T12:00:00Z'));
+      vi.stubEnv('RELEASE_CLICK_IP_HEADER', '');
+      headers.mockResolvedValue(new Headers({
+        'x-real-ip': '198.51.100.7',
+        'x-vercel-forwarded-for': '198.51.100.7',
+        'x-forwarded-for': '198.51.100.7',
+      }));
+      for (let index = 0; index < 30; index++) {
+        expect((await sendContactEmail(contactForm())).success).toBe(true);
+      }
+      expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
+      vi.advanceTimersByTime(10 * 60 * 1000);
+      expect((await sendContactEmail(contactForm())).success).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
-  it('does not throttle when the configured header has no valid IP', async () => {
-    vi.stubEnv('RELEASE_CLICK_IP_HEADER', 'x-real-ip');
-    headers.mockResolvedValue(new Headers({ 'x-real-ip': 'not-an-ip' }));
-    for (let index = 0; index < 5; index++) expect((await sendContactEmail(contactForm())).success).toBe(true);
+  it('falls back to the shared limit when the configured header has no valid IP', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date('2026-11-12T12:00:00Z'));
+      vi.stubEnv('RELEASE_CLICK_IP_HEADER', 'x-real-ip');
+      headers.mockResolvedValue(new Headers({ 'x-real-ip': 'not-an-ip' }));
+      for (let index = 0; index < 30; index++) {
+        expect((await sendContactEmail(contactForm())).success).toBe(true);
+      }
+      expect((await sendContactEmail(contactForm())).error).toContain('Too many messages');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('bounds the number of retained clients even when every request uses a new address', async () => {
