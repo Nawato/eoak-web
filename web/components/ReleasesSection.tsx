@@ -68,19 +68,22 @@ export default function ReleasesSection({
   releases,
   now = new Date(),
   archiveHref,
+  headingLevel = 2,
 }: {
   releases: Release[];
   now?: Date;
   archiveHref?: string;
+  headingLevel?: 1 | 2;
 }) {
   if (releases.length === 0) return null;
   const { upcoming, released } = splitReleases(releases, now);
   if (upcoming.length + released.length === 0) return null;
+  const Heading = headingLevel === 1 ? 'h1' : 'h2';
 
   return (
     <section id="releases" className="scroll-mt-20 py-24">
       <div className="mx-auto max-w-6xl px-4 md:px-8">
-        <h2 className="mb-12 text-center font-display text-4xl font-bold uppercase text-white">Releases</h2>
+        <Heading className="mb-12 text-center font-display text-4xl font-bold uppercase text-white">Releases</Heading>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {upcoming.map((release) => (
             <ReleaseCard key={release._id} release={release} now={now} upcoming />

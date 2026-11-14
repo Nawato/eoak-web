@@ -8,6 +8,7 @@ import PrivacyControls from '@/components/PrivacyControls';
 export const metadata: Metadata = {
   title: 'Datenschutzerklärung',
   alternates: { canonical: '/datenschutz' },
+  robots: { index: false, follow: false },
 };
 
 export default async function DatenschutzPage() {

@@ -20,7 +20,7 @@ vi.mock('@/lib/sanity-image', () => ({
   getObjectPosition: vi.fn(),
 }));
 
-import GalleryPage from './page';
+import GalleryPage, { generateMetadata } from './page';
 
 const photo = {
   _id: 'photo-1',
@@ -74,4 +74,20 @@ it('shows an empty state when both gallery types are disabled', async () => {
   expect(html).toContain('No photos or videos have been published yet.');
   expect(html).not.toContain('A photo caption');
   expect(html).not.toContain('A video title');
+});
+
+it('builds band-aware metadata and breadcrumbs', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ bandName: 'Test Band' });
+
+  const metadata = await generateMetadata();
+  expect(metadata.description).toContain('Test Band');
+  expect(metadata.alternates).toEqual({ canonical: '/gallery' });
+
+  const html = renderToStaticMarkup(await GalleryPage());
+  expect(html).toContain('"@type":"BreadcrumbList"');
+});
+
+it('omits metadata when the gallery page is disabled', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ features: { galleryPage: false } });
+  await expect(generateMetadata()).resolves.toEqual({});
 });

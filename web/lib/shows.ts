@@ -64,9 +64,33 @@ export function formatShowLocation(show: Pick<Show, 'city' | 'region' | 'country
   return parts.join(', ');
 }
 
-/** ISO date used by schema.org MusicEvent. */
+/** ISO date used by schema.org MusicEvent, including the Europe/Berlin UTC offset. */
 export function showStartIso(show: Pick<Show, 'date' | 'startTime'>): string {
   if (!isDateOnly(show.date)) return '';
   const time = /^\d{2}:\d{2}$/.test(show.startTime?.trim() ?? '') ? show.startTime!.trim() : '20:00';
-  return `${show.date}T${time}:00`;
+  return `${show.date}T${time}:00${siteOffset(show.date, time)}`;
+}
+
+const offsetFormat = new Intl.DateTimeFormat('en', {
+  timeZone: SITE_TIME_ZONE,
+  timeZoneName: 'longOffset',
+});
+
+function berlinOffsetMinutes(instant: number): number {
+  const name = offsetFormat.formatToParts(new Date(instant)).find((part) => part.type === 'timeZoneName')?.value ?? '';
+  const match = /^GMT([+-])(\d{2}):(\d{2})$/.exec(name);
+  if (!match) return 0;
+  const minutes = Number(match[2]) * 60 + Number(match[3]);
+  return match[1] === '-' ? -minutes : minutes;
+}
+
+/** Offset formatted as `+01:00`, accounting for daylight saving time. */
+function siteOffset(date: string, time: string): string {
+  const wallClock = Date.parse(`${date}T${time}:00Z`);
+  // Treat the wall clock as UTC, then correct it by the zone offset of that instant.
+  const instant = wallClock - berlinOffsetMinutes(wallClock) * 60_000;
+  const offset = berlinOffsetMinutes(instant);
+  const sign = offset < 0 ? '-' : '+';
+  const absolute = Math.abs(offset);
+  return `${sign}${String(Math.floor(absolute / 60)).padStart(2, '0')}:${String(absolute % 60).padStart(2, '0')}`;
 }

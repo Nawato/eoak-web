@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { getSiteSettings, getPressKit, getReleases, getMembers, getShows } from '@/lib/sanity';
 import { connection } from 'next/server';
 import Hero from '@/components/Hero';
@@ -11,12 +12,42 @@ import MembersSection from '@/components/MembersSection';
 import ContactSection from '@/components/ContactSection';
 import NewsletterSection from '@/components/NewsletterSection';
 import JsonLd from '@/components/JsonLd';
-import { defaultContactEmail, siteUrl } from '@/lib/site';
+import { defaultContactEmail, siteDescription, siteGenre, siteName } from '@/lib/site';
 import { getHttpsLinks, getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl } from '@/lib/embeds';
 import { hasInstagramConfiguration, getInstagramFeed } from '@/lib/instagram';
 import { resolveFeatures } from '@/lib/features';
 import { latestReleaseHref } from '@/lib/releases';
 import { hasNativeNewsletterConfiguration } from '@/lib/newsletter';
+import { getImageUrl, hasImage } from '@/lib/sanity-image';
+import { buildMusicGroupJsonLd, buildWebSiteJsonLd } from '@/lib/structured-data';
+import { metaDescription } from '@/lib/seo';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const bandName = settings?.bandName ?? siteName;
+  const genre = settings?.heroEyebrow?.trim() || siteGenre;
+  const title = `${bandName} — ${genre}`;
+  const description = metaDescription(settings?.heroTagline, siteDescription);
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: '/' },
+    openGraph: {
+      type: 'website',
+      siteName: bandName,
+      locale: 'en_US',
+      title,
+      description,
+      url: '/',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default async function HomePage() {
   await connection();
@@ -55,29 +86,36 @@ export default async function HomePage() {
   const showNewsletter = features.newsletterSection && (nativeNewsletter || Boolean(toHttpsUrl(settings?.newsletterSignupUrl)));
   const showContact = features.contactSection && (features.contactForm || features.contactChannels);
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'MusicGroup',
-    name: bandName,
-    url: siteUrl,
-    genre: 'Metalcore',
-    sameAs: (settings?.socialLinks ?? []).map((link) => toHttpsUrl(link.url)).filter(Boolean),
-    ...(members.length > 0
-      ? { member: members.map((member) => ({ '@type': 'Person', name: member.name })) }
-      : {}),
-    ...(releases.length > 0
-      ? {
-          album: releases
-            .filter((release) => release.slug)
-            .slice(0, 10)
-            .map((release) => ({
-              '@type': 'MusicAlbum',
-              name: release.title,
-              url: `${siteUrl}/releases/${encodeURIComponent(release.slug ?? '')}`,
-            })),
-        }
-      : {}),
-  };
+  const socialLinks = (settings?.socialLinks ?? []).map((link) => toHttpsUrl(link.url));
+  const groupImage = hasImage(settings?.ogImage)
+    ? getImageUrl(settings.ogImage, 1200, 630)
+    : hasImage(settings?.heroBackground)
+      ? getImageUrl(settings.heroBackground, 1200, 630)
+      : undefined;
+  const groupLogo = hasImage(settings?.logo)
+    ? getImageUrl(settings.logo, 600)
+    : hasImage(settings?.headerLogo)
+      ? getImageUrl(settings.headerLogo, 600)
+      : undefined;
+
+  const jsonLd = [
+    buildMusicGroupJsonLd({
+      bandName,
+      description: settings?.heroTagline?.trim() || siteDescription,
+      image: groupImage,
+      logo: groupLogo,
+      sameAs: socialLinks,
+      members: members.map((member) => ({ name: member.name })),
+      albums: releases
+        .filter((release) => release.slug)
+        .slice(0, 10)
+        .map((release) => ({
+          title: release.title,
+          url: `/releases/${encodeURIComponent(release.slug ?? '')}`,
+        })),
+    }),
+    buildWebSiteJsonLd(bandName),
+  ];
 
   return (
     <>

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
@@ -22,34 +22,56 @@ const oswald = Oswald({
   variable: '--font-oswald',
 });
 
-const baseMetadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: siteName,
-    template: `%s | ${siteName}`,
-  },
-  description: siteDescription,
-  alternates: { canonical: '/' },
-  openGraph: {
-    type: 'website',
-    siteName,
-    title: siteName,
-    description: siteDescription,
-    url: '/',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: siteName,
-    description: siteDescription,
-  },
+export const viewport: Viewport = {
+  themeColor: '#09090b',
+  colorScheme: 'dark',
 };
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
+  const bandName = settings?.bandName ?? siteName;
   const faviconUrl = hasImage(settings?.favicon) ? getImageUrl(settings.favicon, 256, 256) : undefined;
+
   return {
-    ...baseMetadata,
-    icons: { icon: faviconUrl ?? '/icon.svg' },
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: bandName,
+      template: `%s | ${bandName}`,
+    },
+    description: siteDescription,
+    applicationName: bandName,
+    authors: [{ name: bandName, url: siteUrl }],
+    creator: bandName,
+    publisher: bandName,
+    alternates: { canonical: '/' },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+        'max-video-preview': -1,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: bandName,
+      locale: 'en_US',
+      title: bandName,
+      description: siteDescription,
+      url: '/',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: bandName,
+      description: siteDescription,
+    },
+    icons: {
+      icon: faviconUrl ?? '/icon.svg',
+      apple: '/apple-icon',
+    },
   };
 }
 

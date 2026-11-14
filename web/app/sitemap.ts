@@ -68,19 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  entries.push(
-    {
-      url: `${siteUrl}/impressum`,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    {
-      url: `${siteUrl}/datenschutz`,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
-    ...releasePaths,
-  );
+  entries.push(...releasePaths);
 
   return entries;
 }

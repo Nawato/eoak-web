@@ -3,19 +3,35 @@ import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { getPhotos, getSiteSettings, getVideos } from '@/lib/sanity';
 import { resolveFeatures } from '@/lib/features';
+import { buildBreadcrumbJsonLd } from '@/lib/structured-data';
+import { siteName } from '@/lib/site';
 import BackgroundSurface from '@/components/BackgroundSurface';
+import JsonLd from '@/components/JsonLd';
 import { PhotoGrid, VideoGrid } from '@/components/GallerySections';
 
-export const metadata: Metadata = {
-  title: 'Gallery',
-  description: 'Band photos and videos.',
-  alternates: { canonical: '/gallery' },
-  openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  if (!resolveFeatures(settings?.features).galleryPage) return {};
+
+  const bandName = settings?.bandName ?? siteName;
+  const description = `Photo gallery and official videos from ${bandName}: live shots, promo photos and music videos.`;
+  return {
     title: 'Gallery',
-    description: 'Band photos and videos.',
-    url: '/gallery',
-  },
-};
+    description,
+    alternates: { canonical: '/gallery' },
+    openGraph: {
+      title: `Gallery | ${bandName}`,
+      description,
+      url: '/gallery',
+      siteName: bandName,
+      locale: 'en_US',
+    },
+    twitter: {
+      title: `Gallery | ${bandName}`,
+      description,
+    },
+  };
+}
 
 export default async function GalleryPage() {
   await connection();
@@ -29,6 +45,12 @@ export default async function GalleryPage() {
 
   return (
     <BackgroundSurface>
+      <JsonLd
+        data={buildBreadcrumbJsonLd([
+          { name: 'Home', path: '/' },
+          { name: 'Gallery', path: '/gallery' },
+        ])}
+      />
       <section className="mx-auto max-w-6xl px-4 py-24 md:px-8">
         <h1 className="mb-4 text-center font-display text-4xl font-bold uppercase text-white md:text-5xl">Gallery</h1>
         <p className="mb-12 text-center text-zinc-400">Photos and videos from the band.</p>

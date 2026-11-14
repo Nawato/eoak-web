@@ -50,8 +50,11 @@ describe('shows', () => {
     });
     expect(formatShowDate(entry)).toBe('Sat, 14 November 2026 · 20:00');
     expect(formatShowLocation(entry)).toBe('Berlin, Germany');
-    expect(showStartIso(entry)).toBe('2026-11-14T20:00:00');
-    expect(showStartIso(show('two', '2026-11-14'))).toBe('2026-11-14T20:00:00');
+    expect(showStartIso(entry)).toBe('2026-11-14T20:00:00+01:00');
+    expect(showStartIso(show('two', '2026-11-14'))).toBe('2026-11-14T20:00:00+01:00');
+    expect(showStartIso(show('summer', '2026-07-14', { startTime: '20:00' }))).toBe(
+      '2026-07-14T20:00:00+02:00',
+    );
     expect(showStartIso(show('bad', '2026-02-30'))).toBe('');
   });
 });

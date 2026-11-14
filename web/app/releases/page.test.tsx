@@ -15,7 +15,7 @@ vi.mock('next/server', () => ({ connection: mocks.connection }));
 vi.mock('next/navigation', () => ({ notFound: mocks.notFound }));
 vi.mock('@/lib/sanity-image', () => ({ hasImage: () => false, getImageUrl: vi.fn() }));
 
-import ReleasesArchivePage from './page';
+import ReleasesArchivePage, { generateMetadata } from './page';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -48,4 +48,23 @@ it('renders an empty state when no releases are published', async () => {
 
   expect(html).toContain('Releases');
   expect(html).toContain('No releases have been published yet.');
+});
+
+it('builds band-aware metadata with a canonical archive URL', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ bandName: 'Test Band' });
+
+  const metadata = await generateMetadata();
+
+  expect(metadata.title).toBe('Releases');
+  expect(metadata.description).toContain('Test Band');
+  expect(metadata.alternates).toEqual({ canonical: '/releases' });
+  expect(metadata.openGraph).toEqual(
+    expect.objectContaining({ title: 'Releases | Test Band', url: '/releases' }),
+  );
+});
+
+it('omits metadata when the archive is disabled', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ features: { releasesArchive: false } });
+
+  await expect(generateMetadata()).resolves.toEqual({});
 });

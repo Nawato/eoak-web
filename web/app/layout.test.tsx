@@ -19,7 +19,28 @@ vi.mock('@/components/Navbar', () => ({
     createElement('nav', {}, links.map((link) => createElement('a', { key: link.href, href: link.href }, link.label))),
 }));
 vi.mock('@/components/Footer', () => ({ default: () => null }));
-import RootLayout from './layout';
+import RootLayout, { generateMetadata, viewport } from './layout';
+
+it('publishes crawl, social and theme defaults', async () => {
+  mocks.getSiteSettings.mockResolvedValue(null);
+
+  const metadata = await generateMetadata();
+
+  expect(metadata.metadataBase?.toString()).toBe('http://localhost:3000/');
+  expect(metadata.title).toEqual({ default: 'End Of All Known', template: '%s | End Of All Known' });
+  expect(metadata.robots).toEqual(
+    expect.objectContaining({
+      index: true,
+      follow: true,
+      googleBot: expect.objectContaining({ 'max-image-preview': 'large' }),
+    }),
+  );
+  expect(metadata.openGraph).toEqual(
+    expect.objectContaining({ locale: 'en_US', siteName: 'End Of All Known' }),
+  );
+  expect(metadata.twitter).toEqual(expect.objectContaining({ card: 'summary_large_image' }));
+  expect(viewport).toEqual(expect.objectContaining({ themeColor: '#09090b', colorScheme: 'dark' }));
+});
 
 it('builds navigation without loading full content lists or the Instagram feed', async () => {
   mocks.getSiteSettings.mockResolvedValue(null);

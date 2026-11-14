@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getImageUrl, getLogo, getObjectPosition, hasImage } from '@/lib/sanity-image';
+import { siteGenre } from '@/lib/site';
 
 interface HeroProps {
   bandName: string;
@@ -56,7 +57,7 @@ export default function Hero({
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-24 text-center">
         <p className="mb-6 text-xs font-medium uppercase tracking-[0.4em] text-accent-text">
-          {eyebrow ?? 'Independent Metalcore'}
+          {eyebrow ?? siteGenre}
         </p>
         {logoSource ? (
           <h1 className="mb-8">

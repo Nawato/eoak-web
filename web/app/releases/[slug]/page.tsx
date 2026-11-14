@@ -11,6 +11,7 @@ import { formatRelativeDate, formatReleaseDate, isUpcoming, releaseStatus } from
 import { getReleasesBackHref, getReleasesIndexHref } from '@/lib/nav';
 import { resolveFeatures } from '@/lib/features';
 import { buildBreadcrumbJsonLd, buildMusicAlbumJsonLd } from '@/lib/structured-data';
+import { metaDescription } from '@/lib/seo';
 import { siteName } from '@/lib/site';
 import BackgroundSurface from '@/components/BackgroundSurface';
 import JsonLd from '@/components/JsonLd';
@@ -22,11 +23,15 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const release = await getRelease(slug);
+  const [release, settings] = await Promise.all([getRelease(slug), getSiteSettings()]);
   if (!release) return {};
 
+  const bandName = settings?.bandName ?? siteName;
   const image = hasImage(release.cover) ? getImageUrl(release.cover, 1200, 630) : undefined;
-  const description = release.teaser?.trim() || `${release.title} by ${siteName}.`;
+  const description = metaDescription(
+    release.teaser,
+    `${release.title} by ${siteName} — listen, view the tracklist and find streaming links.`,
+  );
   return {
     title: release.title,
     description,
@@ -36,6 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: release.title,
       description,
       url: `/releases/${encodeURIComponent(slug)}`,
+      siteName: bandName,
+      locale: 'en_US',
       releaseDate: release.releaseDate,
       musicians: siteName,
       images: image

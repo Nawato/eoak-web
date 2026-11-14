@@ -20,9 +20,11 @@ it('includes release URLs beyond the homepage list limit', async () => {
   });
   mocks.getSiteSettings.mockResolvedValue(null);
   const entries = await sitemap();
-  expect(entries).toHaveLength(64);
-  expect(entries[63].url).toContain('/releases/release-59');
+  expect(entries).toHaveLength(62);
+  expect(entries[61].url).toContain('/releases/release-59');
   expect(entries.some((entry) => entry.url.endsWith('/releases'))).toBe(true);
+  expect(entries.some((entry) => entry.url.endsWith('/impressum'))).toBe(false);
+  expect(entries.some((entry) => entry.url.endsWith('/datenschutz'))).toBe(false);
 });
 
 it('adds enabled tour and gallery pages only when they have content', async () => {

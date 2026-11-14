@@ -5,21 +5,35 @@ import { connection } from 'next/server';
 import { getShows, getSiteSettings } from '@/lib/sanity';
 import { resolveFeatures } from '@/lib/features';
 import { splitShows } from '@/lib/shows';
-import { buildMusicEventJsonLd } from '@/lib/structured-data';
+import { buildBreadcrumbJsonLd, buildMusicEventJsonLd } from '@/lib/structured-data';
+import { siteName } from '@/lib/site';
 import BackgroundSurface from '@/components/BackgroundSurface';
 import JsonLd from '@/components/JsonLd';
 import TourShowList from '@/components/TourShowList';
 
-export const metadata: Metadata = {
-  title: 'Tour Dates',
-  description: 'Upcoming and past live shows.',
-  alternates: { canonical: '/tour' },
-  openGraph: {
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  if (!resolveFeatures(settings?.features).tourArchive) return {};
+
+  const bandName = settings?.bandName ?? siteName;
+  const description = `Live dates for ${bandName} — metalcore shows, venues, ticket links and past tour history.`;
+  return {
     title: 'Tour Dates',
-    description: 'Upcoming and past live shows.',
-    url: '/tour',
-  },
-};
+    description,
+    alternates: { canonical: '/tour' },
+    openGraph: {
+      title: `Tour Dates | ${bandName}`,
+      description,
+      url: '/tour',
+      siteName: bandName,
+      locale: 'en_US',
+    },
+    twitter: {
+      title: `Tour Dates | ${bandName}`,
+      description,
+    },
+  };
+}
 
 export default async function TourPage() {
   await connection();
@@ -35,7 +49,15 @@ export default async function TourPage() {
 
   return (
     <BackgroundSurface background={settings?.pageBackgrounds?.shows}>
-      <JsonLd data={buildMusicEventJsonLd(upcoming, bandName)} />
+      <JsonLd
+        data={[
+          ...buildMusicEventJsonLd(upcoming, bandName),
+          buildBreadcrumbJsonLd([
+            { name: 'Home', path: '/' },
+            { name: 'Tour Dates', path: '/tour' },
+          ]),
+        ]}
+      />
       <section className="mx-auto max-w-4xl px-4 py-24 md:px-8">
         <Link
           href="/"

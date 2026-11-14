@@ -19,7 +19,7 @@ vi.mock('@/lib/sanity-image', () => ({
   getObjectPosition: vi.fn(),
 }));
 
-import TourPage from './page';
+import TourPage, { generateMetadata } from './page';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -80,4 +80,20 @@ it('renders the configured empty state when no shows are upcoming', async () => 
   expect(html).toContain('Nothing announced yet.');
   expect(html).not.toContain('Past shows');
   expect(html).not.toContain('"@type":"MusicEvent"');
+});
+
+it('builds band-aware metadata and breadcrumbs', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ bandName: 'Test Band' });
+
+  const metadata = await generateMetadata();
+  expect(metadata.description).toContain('Test Band');
+  expect(metadata.alternates).toEqual({ canonical: '/tour' });
+
+  const html = renderToStaticMarkup(await TourPage());
+  expect(html).toContain('"@type":"BreadcrumbList"');
+});
+
+it('omits metadata when the tour archive is disabled', async () => {
+  mocks.getSiteSettings.mockResolvedValue({ features: { tourArchive: false } });
+  await expect(generateMetadata()).resolves.toEqual({});
 });

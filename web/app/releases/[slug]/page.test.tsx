@@ -234,8 +234,20 @@ describe('release metadata', () => {
 
     const metadata = await generateMetadata({ params: Promise.resolve({ slug: 'campaign-release' }) });
 
-    expect(metadata.description).toBe('Campaign Release by End Of All Known.');
+    expect(metadata.description).toBe(
+      'Campaign Release by End Of All Known — listen, view the tracklist and find streaming links.',
+    );
     expect(metadata.openGraph).toEqual(expect.objectContaining({ images: undefined }));
     expect(metadata.twitter).toEqual(expect.objectContaining({ images: undefined }));
+  });
+
+  it('clamps a long teaser to a search-result-friendly description', async () => {
+    mocks.getRelease.mockResolvedValue({ ...campaignRelease, teaser: `${'long teaser text '.repeat(20)}` });
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ slug: 'campaign-release' }) });
+
+    expect(typeof metadata.description).toBe('string');
+    expect(metadata.description?.length).toBeLessThanOrEqual(160);
+    expect(metadata.description?.endsWith('…')).toBe(true);
   });
 });

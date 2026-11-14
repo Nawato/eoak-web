@@ -7,6 +7,7 @@ import LegalContact from '@/components/LegalContact';
 export const metadata: Metadata = {
   title: 'Impressum',
   alternates: { canonical: '/impressum' },
+  robots: { index: false, follow: false },
 };
 
 export default async function ImpressumPage() {
