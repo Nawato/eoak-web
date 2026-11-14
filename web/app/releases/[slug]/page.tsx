@@ -2,11 +2,13 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 import { connection } from 'next/server';
 import { getRelease, getSiteSettings } from '@/lib/sanity';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { getHttpsLinks, toHttpsUrl } from '@/lib/embeds';
 import { formatRelativeDate, formatReleaseDate, isUpcoming, releaseStatus } from '@/lib/releases';
+import { getReleasesBackHref, getReleasesIndexHref } from '@/lib/nav';
 import { resolveFeatures } from '@/lib/features';
 import { buildBreadcrumbJsonLd, buildMusicAlbumJsonLd } from '@/lib/structured-data';
 import { siteName } from '@/lib/site';
@@ -65,7 +67,10 @@ export default async function ReleasePage({ params }: Props) {
   const preSaveUrl = toHttpsUrl(release.preSaveUrl);
   const preOrderUrl = toHttpsUrl(release.preOrderUrl);
   const bandName = settings?.bandName ?? siteName;
-  const backHref = features.releasesArchive ? '/releases' : '/#releases';
+  // The nav's releases link is the canonical index; the visible back link keeps
+  // the visitor's context when they arrived from the archive page.
+  const releasesIndexHref = getReleasesIndexHref(features) ?? '/';
+  const backHref = getReleasesBackHref(features, (await headers()).get('referer'));
 
   const showCountdown = upcoming && features.releaseCountdown && release.countdownEnabled !== false;
   const showTracklist = features.releaseTracklist && release.tracklistEnabled !== false;
@@ -81,7 +86,7 @@ export default async function ReleasePage({ params }: Props) {
     }),
     buildBreadcrumbJsonLd([
       { name: 'Home', path: '/' },
-      { name: 'Releases', path: backHref },
+      { name: 'Releases', path: releasesIndexHref },
       { name: release.title, path: `/releases/${encodeURIComponent(slug)}` },
     ]),
   ];

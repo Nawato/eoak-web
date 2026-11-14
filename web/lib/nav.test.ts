@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getNavLinks } from './nav';
+import { getNavLinks, getReleasesBackHref, getReleasesIndexHref } from './nav';
+import { resolveFeatures } from './features';
 
 describe('content-aware navigation', () => {
   it.each([
@@ -81,5 +82,34 @@ describe('content-aware navigation', () => {
       expect.arrayContaining(['/#music', '/#shows', '/#bio', '/#contact']),
     );
     expect(links.some((link) => link.href === '/#gallery')).toBe(false);
+  });
+});
+
+describe('releases index links', () => {
+  const enabled = resolveFeatures({});
+
+  it('prefers the homepage section and falls back to the archive', () => {
+    expect(getReleasesIndexHref(enabled)).toBe('/#releases');
+    expect(getReleasesIndexHref(resolveFeatures({ releasesSection: false }))).toBe('/releases');
+    expect(getReleasesIndexHref(resolveFeatures({ releasesSection: false, releasesArchive: false }))).toBeNull();
+  });
+
+  it('keeps the archive context only when the visitor came from the archive', () => {
+    expect(getReleasesBackHref(enabled, 'https://example.com/releases')).toBe('/releases');
+    expect(getReleasesBackHref(enabled, 'https://example.com/releases/')).toBe('/releases');
+    expect(getReleasesBackHref(enabled, 'https://example.com/releases?page=2')).toBe('/releases');
+    expect(getReleasesBackHref(enabled, 'https://example.com/')).toBe('/#releases');
+    expect(getReleasesBackHref(enabled, undefined)).toBe('/#releases');
+    expect(getReleasesBackHref(enabled, 'not a url')).toBe('/#releases');
+  });
+
+  it('never links back to a disabled archive', () => {
+    const archiveOff = resolveFeatures({ releasesArchive: false });
+    expect(getReleasesBackHref(archiveOff, 'https://example.com/releases')).toBe('/#releases');
+  });
+
+  it('falls back to the homepage when no releases index is enabled', () => {
+    const bothOff = resolveFeatures({ releasesSection: false, releasesArchive: false });
+    expect(getReleasesBackHref(bothOff, 'https://example.com/releases')).toBe('/');
   });
 });

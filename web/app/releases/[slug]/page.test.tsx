@@ -5,11 +5,13 @@ const mocks = vi.hoisted(() => ({
   getRelease: vi.fn(),
   getSiteSettings: vi.fn(),
   connection: vi.fn(),
+  headers: vi.fn(),
   hasImage: vi.fn(() => false),
   getImageUrl: vi.fn(),
 }));
 vi.mock('@/lib/sanity', () => mocks);
 vi.mock('next/server', () => ({ connection: mocks.connection }));
+vi.mock('next/headers', () => ({ headers: mocks.headers }));
 vi.mock('next/navigation', () => ({ notFound: () => { throw new Error('NOT_FOUND'); } }));
 vi.mock('@/lib/sanity-image', () => ({ hasImage: mocks.hasImage, getImageUrl: mocks.getImageUrl }));
 import ReleasePage, { generateMetadata } from './page';
@@ -33,6 +35,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.hasImage.mockReturnValue(false);
   mocks.getImageUrl.mockReset();
+  mocks.headers.mockResolvedValue(new Headers());
   mocks.getRelease.mockResolvedValue({
     _id: 'older-release', title: 'Older Release', slug: 'older-release', releaseDate: '2020-01-01',
     links: [{ _key: 'spotify', label: 'Spotify', url: 'https://music.example/track' }],
@@ -78,7 +81,55 @@ describe('release campaign features', () => {
     expect(html).toContain('Share this release');
     expect(html).toContain('"@type":"MusicAlbum"');
     expect(html).toContain('"@type":"BreadcrumbList"');
+    expect(html).toContain('href="/#releases"');
+  });
+
+  it('falls back to the releases archive page when the homepage section is disabled', async () => {
+    mocks.getRelease.mockResolvedValue(campaignRelease);
+    mocks.getSiteSettings.mockResolvedValue({
+      features: { releasesSection: false, releasesArchive: true },
+    });
+
+    const html = renderToStaticMarkup(await ReleasePage({ params: Promise.resolve({ slug: 'campaign-release' }) }));
+
     expect(html).toContain('href="/releases"');
+    expect(html).not.toContain('href="/#releases"');
+  });
+
+  it('keeps the archive as the back link when the visitor came from it', async () => {
+    mocks.getRelease.mockResolvedValue(campaignRelease);
+    mocks.getSiteSettings.mockResolvedValue({ features: {} });
+    mocks.headers.mockResolvedValue(new Headers({ referer: 'https://example.com/releases' }));
+
+    const html = renderToStaticMarkup(await ReleasePage({ params: Promise.resolve({ slug: 'campaign-release' }) }));
+
+    expect(html).toContain('← All releases');
+    expect(html).toContain('href="/releases"');
+    // The breadcrumb stays canonical regardless of how the visitor arrived.
+    expect(html).toContain('/#releases');
+  });
+
+  it('ignores an archive referer when the archive is disabled', async () => {
+    mocks.getRelease.mockResolvedValue(campaignRelease);
+    mocks.getSiteSettings.mockResolvedValue({ features: { releasesArchive: false } });
+    mocks.headers.mockResolvedValue(new Headers({ referer: 'https://example.com/releases' }));
+
+    const html = renderToStaticMarkup(await ReleasePage({ params: Promise.resolve({ slug: 'campaign-release' }) }));
+
+    expect(html).toContain('href="/#releases"');
+    expect(html).not.toContain('href="/releases"');
+  });
+
+  it('falls back to the homepage when neither releases index is enabled', async () => {
+    mocks.getRelease.mockResolvedValue(campaignRelease);
+    mocks.getSiteSettings.mockResolvedValue({
+      features: { releasesSection: false, releasesArchive: false },
+    });
+
+    const html = renderToStaticMarkup(await ReleasePage({ params: Promise.resolve({ slug: 'campaign-release' }) }));
+
+    expect(html).toContain('← All releases');
+    expect(html).toContain('href="/"');
   });
 
   it('respects the global kill switches even when a release enables a feature', async () => {

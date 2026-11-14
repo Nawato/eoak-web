@@ -21,6 +21,32 @@ export interface NavContent {
   instagramHeading?: string | null;
 }
 
+/** Where the releases index lives: the homepage section first, the archive second. */
+export function getReleasesIndexHref(enabled: SiteFeatures): string | null {
+  if (enabled.releasesSection) return '/#releases';
+  if (enabled.releasesArchive) return '/releases';
+  return null;
+}
+
+/** Pathname of an HTTP referer, or null when it is missing or unparseable. */
+function refererPath(referer?: string | null): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).pathname.replace(/\/+$/, '') || '/';
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Back link for a release page. Keep the visitor's context when they came from
+ * the archive; otherwise point at the primary releases index.
+ */
+export function getReleasesBackHref(enabled: SiteFeatures, referer?: string | null): string {
+  if (enabled.releasesArchive && refererPath(referer) === '/releases') return '/releases';
+  return getReleasesIndexHref(enabled) ?? '/';
+}
+
 export function getNavLinks({
   features,
   hasReleases,
@@ -45,8 +71,8 @@ export function getNavLinks({
   if (enabled.musicSection) links.push({ href: '/#music', label: 'Music' });
 
   if (hasReleases) {
-    if (enabled.releasesSection) links.push({ href: '/#releases', label: 'Releases' });
-    else if (enabled.releasesArchive) links.push({ href: '/releases', label: 'Releases' });
+    const releasesHref = getReleasesIndexHref(enabled);
+    if (releasesHref) links.push({ href: releasesHref, label: 'Releases' });
   }
 
   if (hasShows && enabled.tourArchive) links.push({ href: '/tour', label: 'Tour' });
