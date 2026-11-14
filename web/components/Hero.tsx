@@ -13,6 +13,7 @@ interface HeroProps {
   merchUrl?: string | null;
   latestReleaseHref?: string;
   showTourCta?: boolean;
+  tourCtaLabel?: string | null;
 }
 
 export default function Hero({
@@ -26,6 +27,7 @@ export default function Hero({
   merchUrl,
   latestReleaseHref = '#releases',
   showTourCta = true,
+  tourCtaLabel,
 }: HeroProps) {
   const logoSource = getLogo(logo, 1200);
   const backgroundUrl = hasImage(background) ? getImageUrl(background, 2400) : undefined;
@@ -88,7 +90,7 @@ export default function Hero({
               href="#shows"
               className="rounded-sm border border-white/15 px-8 py-4 text-sm font-semibold uppercase tracking-widest text-foreground transition-colors hover:border-accent hover:text-accent-text"
             >
-              Tour Dates
+              {tourCtaLabel?.trim() || 'Tour Dates'}
             </Link>
           )}
           {merchUrl && (

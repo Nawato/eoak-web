@@ -93,6 +93,7 @@ export default async function HomePage() {
         merchUrl={toHttpsUrl(settings?.merchUrl)}
         latestReleaseHref={latestHref}
         showTourCta={features.tourSection}
+        tourCtaLabel={settings?.tourHeading}
       />
 
       {features.musicSection && hasMusicContent && (

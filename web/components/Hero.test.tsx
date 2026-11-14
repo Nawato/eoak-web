@@ -57,4 +57,18 @@ describe('hero photo overlay', () => {
     }));
     expect(html).not.toContain('href="#shows"');
   });
+
+  it('labels the tour CTA with the CMS heading and falls back to Tour Dates', () => {
+    const custom = renderToStaticMarkup(createElement(Hero, {
+      bandName: 'End Of All Known',
+      tourCtaLabel: 'Live Dates',
+    }));
+    expect(custom).toContain('Live Dates');
+
+    const fallback = renderToStaticMarkup(createElement(Hero, {
+      bandName: 'End Of All Known',
+      tourCtaLabel: '   ',
+    }));
+    expect(fallback).toContain('Tour Dates');
+  });
 });
