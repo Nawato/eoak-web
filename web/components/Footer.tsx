@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ConsentSettingsButton from '@/components/ConsentSettingsButton';
 import SocialIcon from '@/components/SocialIcon';
 import { toHttpsUrl } from '@/lib/embeds';
 import { socialPlatforms, type SocialLink, type PhotoCredit } from '@/sanity/types';
@@ -11,7 +12,6 @@ interface FooterProps {
   pressUrl?: string | null;
   pressLabel?: string | null;
   pressDescription?: string | null;
-  showPrivacySettings?: boolean;
 }
 
 export default function Footer({
@@ -22,7 +22,6 @@ export default function Footer({
   pressUrl,
   pressLabel,
   pressDescription,
-  showPrivacySettings = false,
 }: FooterProps) {
   const year = new Date().getFullYear();
   const credits = (photoCredits ?? []).filter((credit) => credit.name?.trim());
@@ -102,11 +101,7 @@ export default function Footer({
           <Link href="/datenschutz" className="text-muted transition-colors hover:text-accent-text">
             Datenschutz
           </Link>
-          {showPrivacySettings && (
-            <Link href="/datenschutz#consent" className="text-muted transition-colors hover:text-accent-text">
-              Privacy settings
-            </Link>
-          )}
+          <ConsentSettingsButton />
         </nav>
       </div>
     </footer>

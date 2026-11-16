@@ -19,6 +19,7 @@ describe('photographer credits', () => {
     expect(html).toContain('End Of All Known');
     expect(html).toContain('href="/impressum"');
     expect(html).toContain('href="/datenschutz"');
+    expect(html).toContain('Privacy settings');
   });
 
   it('renders the editable heading, names, descriptions and ordering', () => {

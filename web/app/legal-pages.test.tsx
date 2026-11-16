@@ -66,8 +66,11 @@ describe('German legal pages', () => {
     expect(html).toContain('Art. 21 DSGVO');
     expect(html).toContain('Art. 77 DSGVO');
     expect(html).toContain('§ 25 Abs. 1 TDDDG');
-    expect(html).toContain('Alle Medien-Einwilligungen widerrufen');
+    expect(html).toContain('§ 25 Abs. 2 Nr. 2 TDDDG');
+    expect(html).toContain('eoak-consent-v1');
+    expect(html).toContain('Externe Medien (optional)');
     expect(html).not.toContain('<iframe');
+    expect(html).not.toContain('widget.bandsintown.com');
   });
 
   it('renders configured provider and transfer disclosures', async () => {

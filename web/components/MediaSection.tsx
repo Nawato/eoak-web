@@ -1,13 +1,20 @@
 import ConsentEmbed from '@/components/ConsentEmbed';
+import type { ConsentMedia } from '@/lib/cookie-consent';
 import { getSpotifyEmbedUrl, getYouTubeVideoId, getHttpsLinks, type LabeledLink } from '@/lib/embeds';
 
 interface MediaSectionProps {
   latestYoutubeUrl: string;
   featuredSpotifyUrl: string;
   streamingLinks?: LabeledLink[];
+  initialMedia?: ConsentMedia | null;
 }
 
-export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, streamingLinks = [] }: MediaSectionProps) {
+export default function MediaSection({
+  latestYoutubeUrl,
+  featuredSpotifyUrl,
+  streamingLinks = [],
+  initialMedia = null,
+}: MediaSectionProps) {
   const links = getHttpsLinks(streamingLinks);
   const videoId = getYouTubeVideoId(latestYoutubeUrl);
   const spotifyEmbedUrl = getSpotifyEmbedUrl(featuredSpotifyUrl);
@@ -26,9 +33,11 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
             </h3>
             {videoId ? (
               <ConsentEmbed
-                provider="YouTube"
-                description="This video is hosted by YouTube."
-                className="rounded-sm border border-white/10 bg-black [&>div]:lg:aspect-video"
+                provider="youtube"
+                description="Dieses Video wird von YouTube bereitgestellt."
+                initialAllowed={initialMedia?.youtube === true}
+                className="aspect-video overflow-hidden rounded-sm border border-white/10 bg-black"
+                placeholderClassName="h-full"
               >
                 <iframe
                   className="block aspect-video w-full"
@@ -53,9 +62,11 @@ export default function MediaSection({ latestYoutubeUrl, featuredSpotifyUrl, str
             </h3>
             {spotifyEmbedUrl ? (
               <ConsentEmbed
-                provider="Spotify"
-                description="This player is provided by Spotify."
-                className="relative h-[400px] rounded-sm border border-white/10 lg:h-auto lg:flex-1 [&>div]:absolute [&>div]:inset-0 [&>div]:min-h-0 [&>div]:overflow-auto"
+                provider="spotify"
+                description="Dieser Player wird von Spotify bereitgestellt."
+                initialAllowed={initialMedia?.spotify === true}
+                className="relative h-[400px] overflow-hidden rounded-sm border border-white/10 lg:h-auto lg:flex-1"
+                placeholderClassName="absolute inset-0 overflow-auto"
               >
                 <iframe
                   className="absolute inset-0 block h-full w-full"

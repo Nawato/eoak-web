@@ -1,35 +1,80 @@
 'use client';
 
 import Link from 'next/link';
-import { useSyncExternalStore, type ReactNode } from 'react';
-import { readConsent, writeConsent, subscribeConsent } from '@/lib/consent';
+import type { ReactNode } from 'react';
+import { consentProviderLabels, type ConsentProvider } from '@/lib/cookie-consent';
+import { loadConsentOnce, openConsentSettings, revokeConsent, useConsentProvider } from '@/lib/consent';
 import { cn } from '@/lib/utils';
 
 interface ConsentEmbedProps {
-  provider: string;
+  provider: ConsentProvider;
   description: string;
+  initialAllowed: boolean;
   children: ReactNode;
   className?: string;
+  placeholderClassName?: string;
+  /** In-flow skeleton that reserves the same space as the loaded content. */
+  placeholderBackdrop?: ReactNode;
 }
 
-export default function ConsentEmbed({ provider, description, children, className }: ConsentEmbedProps) {
-  const consented = useSyncExternalStore(
-    subscribeConsent,
-    () => readConsent(provider),
-    () => false,
+function PlaceholderContent({ provider, description }: { provider: ConsentProvider; description: string }) {
+  const label = consentProviderLabels[provider];
+  return (
+    <>
+      <p className="max-w-md text-sm text-zinc-400">
+        {description} Beim Laden werden Ihre IP-Adresse und Browserdaten an {label} übertragen; der
+        Anbieter kann Cookies oder ähnliche Kennungen setzen. Siehe{' '}
+        <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-rose-300">
+          Datenschutzerklärung
+        </Link>
+        .
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button
+          type="button"
+          onClick={() => loadConsentOnce(provider)}
+          className="rounded-sm bg-accent px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-accent-dark"
+        >
+          Einmal laden
+        </button>
+        <button
+          type="button"
+          onClick={openConsentSettings}
+          className="rounded-sm border border-white/30 px-5 py-3 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:border-accent"
+        >
+          Einstellungen öffnen
+        </button>
+      </div>
+    </>
   );
+}
 
-  if (consented) {
+export default function ConsentEmbed({
+  provider,
+  description,
+  initialAllowed,
+  children,
+  className,
+  placeholderClassName,
+  placeholderBackdrop,
+}: ConsentEmbedProps) {
+  const allowed = useConsentProvider(provider, initialAllowed);
+  const label = consentProviderLabels[provider];
+
+  if (allowed) {
     return (
       <div className={cn('relative', className)}>
         {children}
         <button
           type="button"
-          aria-label={`Revoke ${provider} consent`}
-          onClick={() => writeConsent(provider, false)}
-          className="absolute right-2 top-2 z-10 rounded-sm border border-white/15 bg-black/80 px-2 py-1.5 text-xs text-zinc-300 shadow-sm transition-colors hover:bg-black hover:text-white"
+          lang="de"
+          aria-label={`Einwilligung für ${label} widerrufen`}
+          onClick={() => {
+            void revokeConsent(provider).catch(() => {});
+          }}
+          className="absolute right-2 top-2 z-10 inline-flex min-h-11 items-center rounded-sm border border-white/15 bg-black/80 px-3 py-2 text-xs text-zinc-200 shadow-sm transition-colors hover:bg-black hover:text-white"
         >
-          Revoke consent
+          Einwilligung widerrufen
         </button>
       </div>
     );
@@ -37,23 +82,24 @@ export default function ConsentEmbed({ provider, description, children, classNam
 
   return (
     <div className={className}>
-      <div className="flex h-full min-h-48 flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="max-w-md text-sm text-zinc-400">
-          {description} Loading this content transfers your IP address to {provider} and may set cookies or
-          similar identifiers. See our{' '}
-          <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-rose-300">
-            privacy policy
-          </Link>
-          .
-        </p>
-        <button
-          type="button"
-          onClick={() => writeConsent(provider, true)}
-          className="rounded-sm bg-accent px-6 py-3 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-accent-dark"
+      {placeholderBackdrop ? (
+        <div className="relative">
+          {placeholderBackdrop}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/85 p-6 text-center" lang="de">
+            <PlaceholderContent provider={provider} description={description} />
+          </div>
+        </div>
+      ) : (
+        <div
+          lang="de"
+          className={cn(
+            'flex h-full min-h-48 flex-col items-center justify-center gap-4 p-6 text-center',
+            placeholderClassName,
+          )}
         >
-          Load {provider} content
-        </button>
-      </div>
+          <PlaceholderContent provider={provider} description={description} />
+        </div>
+      )}
     </div>
   );
 }

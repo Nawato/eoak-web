@@ -136,11 +136,23 @@ export default async function DatenschutzPage() {
           </section>
 
           <section id="consent">
-            <h2>6. Externe Medien und Einwilligung</h2>
+            <h2>6. Cookies, externe Medien und Einwilligung</h2>
+            <h3>6.1 Eigene Speicherung Ihrer Auswahl</h3>
             <p>
-              YouTube, Spotify, Instagram-Fotos und Bandsintown werden erst nach Ihrer freiwilligen,
-              anbieterspezifischen Einwilligung geladen. Ohne Einwilligung können Sie die übrige Website nutzen.
-              Rechtsgrundlage für die Datenverarbeitung ist Art. 6 Abs. 1 lit. a DSGVO; soweit Informationen auf Ihrem
+              Wir setzen ein eigenes, technisch notwendiges First-Party-Cookie mit dem Namen
+              „eoak-consent-v1“, um Ihre Auswahl zu externen Medien zu speichern. Es enthält ausschließlich die
+              Version, den Zeitpunkt Ihrer Auswahl und vier Ja/Nein-Werte für YouTube, Spotify, Instagram und
+              Bandsintown – keine IP-Adresse, keine E-Mail-Adresse und keine Browserkennungen. Das Cookie wird mit
+              Pfad „/“, „SameSite=Lax“ und in Produktion dem „Secure“-Flag gesetzt, ist nicht „HttpOnly“ (damit die
+              Auswahl im Browser unmittelbar umgesetzt werden kann) und läuft nach 180 Tagen ab; danach fragen wir
+              erneut. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG und Art. 6 Abs. 1 lit. f DSGVO (Umsetzung Ihrer
+              Datenschutzauswahl). Wir setzen keine eigenen Analyse- oder Marketing-Cookies.
+            </p>
+            <h3>6.2 Externe Medien</h3>
+            <p>
+              YouTube, Spotify, Instagram-Fotos und Bandsintown laden wir erst, wenn Sie dem jeweiligen Anbieter im
+              Banner zugestimmt haben. Ohne Einwilligung laden wir keine Inhalte dieser Anbieter; die übrige Website
+              können Sie weiter nutzen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO; soweit Informationen auf Ihrem
               Endgerät gespeichert oder ausgelesen werden, gilt § 25 Abs. 1 TDDDG. Beim Laden erhalten Anbieter
               insbesondere IP-Adresse, Browserdaten, Zeitpunkt und ggf. die Herkunftsseite. Abhängig vom Dienst können
               Cookies oder ähnliche Kennungen für Nutzungsanalyse, Profilbildung oder Werbung eingesetzt und Daten mit
@@ -171,22 +183,18 @@ export default async function DatenschutzPage() {
             <p>
               Die eigenständige Verarbeitung durch Medienanbieter und deren Speicherfristen richten sich nach den
               verlinkten Datenschutzhinweisen. Insbesondere können Daten in den USA verarbeitet werden; Hinweise zu den
-              tatsächlich verwendeten Übermittlungsgrundlagen finden Sie in Abschnitt 7.
+              tatsächlich verwendeten Übermittlungsgrundlagen finden Sie in Abschnitt 8.
             </p>
-            <h3>Einwilligung speichern und widerrufen</h3>
+            <h3>6.3 Auswahl ändern, einmalig laden und widerrufen</h3>
             <p>
-              Ihre Auswahl wird unter den Schlüsseln „eoak-consent:YouTube“, „eoak-consent:Spotify“,
-              „eoak-consent:Instagram“ und „eoak-consent:Bandsintown“ im localStorage Ihres Browsers gespeichert.
-              Einträge haben derzeit keine automatische Ablaufzeit; sie bleiben bis zum Widerruf oder Löschen der
-              Browserdaten bestehen. Bei gesperrtem Speicher gilt die Auswahl nur bis zum erneuten Laden. Die
-              Speicherung der von Ihnen angeforderten Datenschutzauswahl dient deren Umsetzung (§ 25 Abs. 2 Nr. 2 TDDDG;
-              Art. 6 Abs. 1 lit. f DSGVO).
-            </p>
-            <p>
-              Sie können Ihre Einwilligung jederzeit über „Revoke consent“ oben am jeweiligen Inhalt oder über die
-              folgende Schaltfläche für die Zukunft widerrufen. Auf dieser Seite werden keine externen Medien geladen.
-              Der Widerruf löscht nicht bereits bei Drittanbietern gespeicherte Daten und berührt nicht die
-              Rechtmäßigkeit der vorherigen Verarbeitung.
+              Ihre Auswahl speichern wir im oben genannten Cookie. Sie können sie jederzeit über „Privacy settings“ im
+              Footer oder über die folgende Schaltfläche ändern. Ein Widerruf wirkt für die Zukunft; bereits bei
+              Drittanbietern gespeicherte Daten werden dadurch nicht gelöscht. Über „Einmal laden“ können Sie einzelne
+              Inhalte ohne dauerhafte Speicherung Ihrer Auswahl für den aktuellen Seitenbesuch laden; diese Auswahl gilt
+              nur bis zum Neuladen der Seite. Nach einem Widerruf kann bereits geladenes
+              Bandsintown-Widget-JavaScript bis zum nächsten Seitenaufruf aktiv bleiben; ein Neuladen der Seite beendet
+              es. Von Anbietern bereits gesetzte Cookies oder Kennungen werden durch den Widerruf auf unserer Website
+              nicht gelöscht.
             </p>
             <PrivacyControls />
           </section>
@@ -206,7 +214,8 @@ export default async function DatenschutzPage() {
               Empfänger sind die oben genannten Hosting-, Inhalts-, Versand- und Postfachdienstleister sowie nach Ihrer
               Einwilligung die Medienanbieter. Soweit Dienstleister in unserem Auftrag handeln, ist ein Vertrag nach
               Art. 28 DSGVO erforderlich. Eine Einwilligung zum Laden externer Medien ersetzt nicht die Anforderungen
-              für Drittlandübermittlungen nach Art. 44 ff. DSGVO.
+              für Drittlandübermittlungen nach Art. 44 ff. DSGVO. Das Auswahl-Cookie „eoak-consent-v1“ enthält keine
+              IP-Adresse und keine E-Mail-Adresse.
             </p>
             <p className="whitespace-pre-line">
               {impressum?.internationalTransfers ||
@@ -224,7 +233,8 @@ export default async function DatenschutzPage() {
               Unter den jeweiligen gesetzlichen Voraussetzungen haben Sie das Recht auf Auskunft (Art. 15), Berichtigung
               (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18) und Datenübertragbarkeit (Art. 20 DSGVO).
               Einwilligungen können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO). Wenden
-              Sie sich dafür an den oben genannten Datenschutzkontakt.
+              Sie sich dafür an den oben genannten Datenschutzkontakt. Für Medien-Einwilligungen können Sie Ihre Auswahl
+              außerdem jederzeit über „Privacy settings“ im Footer oder über den Abschnitt 6 dieser Seite ändern.
             </p>
             <h3>Widerspruchsrecht nach Art. 21 DSGVO</h3>
             <p>

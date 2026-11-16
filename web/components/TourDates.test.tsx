@@ -2,6 +2,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import TourDates from './TourDates';
+import { deniedMedia } from '@/lib/cookie-consent';
 import type { Show } from '@/lib/sanity';
 
 const now = new Date('2026-11-12T12:00:00Z');
@@ -59,7 +60,7 @@ describe('manual tour dates', () => {
     expect(html).not.toContain('href="https://tickets.example/past"');
     expect(html).toContain('With Support Act');
     expect(html).toContain('application/ld+json');
-    expect(html).not.toContain('Load Bandsintown content');
+    expect(html).not.toContain('Einmal laden');
   });
 
   it('prefers published shows over Bandsintown in auto mode', () => {
@@ -68,16 +69,28 @@ describe('manual tour dates', () => {
       shows: [show('future', '2027-01-15')],
     });
     expect(html).toContain('Venue future');
-    expect(html).not.toContain('Load Bandsintown content');
+    expect(html).not.toContain('Einmal laden');
   });
 
-  it('falls back to the consent-gated Bandsintown widget without upcoming shows', () => {
+  it('falls back to the consent placeholder without upcoming shows', () => {
     const html = renderTour({
       mode: 'auto',
       shows: [show('past', '2026-10-01')],
     });
-    expect(html).toContain('Load Bandsintown content');
+    expect(html).toContain('Einmal laden');
+    expect(html).toContain('Die Konzerttermine werden von Bandsintown bereitgestellt.');
+    expect(html).not.toContain('widget.bandsintown.com');
     expect(html).not.toContain('Venue past');
+  });
+
+  it('renders the Bandsintown widget when that provider is allowed', () => {
+    const html = renderTour({
+      mode: 'auto',
+      shows: [show('past', '2026-10-01')],
+      initialMedia: { ...deniedMedia, bandsintown: true },
+    });
+    expect(html).not.toContain('Einmal laden');
+    expect(html).toContain('Einwilligung für Bandsintown widerrufen');
   });
 
   it('shows custom labels, an empty state and the archive link', () => {

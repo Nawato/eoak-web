@@ -1,14 +1,17 @@
 import { createElement, type ReactNode } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { getInstagramPostUrl } from '@/lib/embeds';
 import type { InstagramFeed } from '@/lib/instagram';
 
-const state = vi.hoisted(() => ({ consent: false }));
 vi.mock('@/components/ConsentEmbed', () => ({
-  default: ({ children }: { children: ReactNode }) => (state.consent ? children : 'Consent required'),
+  default: ({ children, initialAllowed }: { children: ReactNode; initialAllowed: boolean }) =>
+    initialAllowed ? children : 'Consent required',
 }));
 import InstagramSection from './InstagramSection';
+import { deniedMedia } from '@/lib/cookie-consent';
+
+const instagramMedia = { ...deniedMedia, instagram: true };
 
 const feed: InstagramFeed = {
   status: 'ready',
@@ -41,10 +44,6 @@ describe('Instagram post validation', () => {
 });
 
 describe('latest Instagram photos', () => {
-  beforeEach(() => {
-    state.consent = false;
-  });
-
   it('hides when not configured', () => {
     expect(
       renderToStaticMarkup(
@@ -64,13 +63,13 @@ describe('latest Instagram photos', () => {
   });
 
   it('renders six complete photos without Instagram UI after consent', () => {
-    state.consent = true;
     const html = renderToStaticMarkup(
       createElement(InstagramSection, {
         feed,
         heading: 'Band updates',
         followLabel: 'Join us',
         profileUrl: 'https://instagram.com/band/',
+        initialMedia: instagramMedia,
       }),
     );
     expect(html.match(/<img/g)).toHaveLength(6);

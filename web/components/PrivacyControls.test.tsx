@@ -1,22 +1,24 @@
-import { describe, expect, it, vi } from 'vitest';
-const mocks = vi.hoisted(() => ({ writeConsent: vi.fn(), setRevoked: vi.fn() }));
-vi.mock('@/lib/consent', () => ({ writeConsent: mocks.writeConsent }));
-vi.mock('react', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('react')>()),
-  useState: () => [false, mocks.setRevoked],
-}));
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { describe, expect, it } from 'vitest';
 import PrivacyControls from './PrivacyControls';
 
 describe('privacy controls', () => {
-  it('revokes each provider choice and confirms withdrawal', () => {
-    const element = PrivacyControls();
-    element.props.children[0].props.onClick();
-    expect(mocks.writeConsent.mock.calls).toEqual([
-      ['YouTube', false],
-      ['Spotify', false],
-      ['Instagram', false],
-      ['Bandsintown', false],
-    ]);
-    expect(mocks.setRevoked).toHaveBeenCalledWith(true);
+  it('renders granular provider switches and equally weighted actions', () => {
+    const html = renderToStaticMarkup(createElement(PrivacyControls));
+
+    for (const label of ['YouTube', 'Spotify', 'Instagram', 'Bandsintown']) {
+      expect(html).toContain(label);
+    }
+    expect(html.match(/role="switch"/g)).toHaveLength(4);
+    expect(html).toContain('Externe Medien (optional)');
+    expect(html).toContain('Alle akzeptieren');
+    expect(html).toContain('Nur notwendige');
+    expect(html).toContain('Auswahl speichern');
+  });
+
+  it('does not preset any provider switch', () => {
+    const html = renderToStaticMarkup(createElement(PrivacyControls));
+    expect(html).not.toContain('checked=""');
   });
 });

@@ -2,6 +2,7 @@ import BandsintownWidget from '@/components/BandsintownWidget';
 import ConsentEmbed from '@/components/ConsentEmbed';
 import JsonLd from '@/components/JsonLd';
 import TourShowList from '@/components/TourShowList';
+import type { ConsentMedia } from '@/lib/cookie-consent';
 import { toHttpsUrl } from '@/lib/embeds';
 import { splitShows } from '@/lib/shows';
 import { buildMusicEventJsonLd } from '@/lib/structured-data';
@@ -20,6 +21,7 @@ interface TourDatesProps {
   soldOutLabel?: string | null;
   archiveHref?: string;
   now?: Date;
+  initialMedia?: ConsentMedia | null;
 }
 
 export default function TourDates({
@@ -33,6 +35,7 @@ export default function TourDates({
   soldOutLabel,
   archiveHref,
   now = new Date(),
+  initialMedia = null,
 }: TourDatesProps) {
   const { upcoming } = splitShows(shows, now);
   const useManualShows = mode === 'manual' || (mode === 'auto' && upcoming.length > 0);
@@ -74,8 +77,9 @@ export default function TourDates({
         ) : (
           <>
             <ConsentEmbed
-              provider="Bandsintown"
-              description="Tour dates are provided by Bandsintown."
+              provider="bandsintown"
+              description="Die Konzerttermine werden von Bandsintown bereitgestellt."
+              initialAllowed={initialMedia?.bandsintown === true}
               className="mx-auto max-w-xl rounded-sm border border-white/10 bg-zinc-800 p-6"
             >
               <BandsintownWidget key={artistName} artistName={artistName} />

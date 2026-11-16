@@ -1,82 +1,51 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { readConsent, subscribeConsent, writeConsent } from './consent';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { migrateLegacyConsent, isProviderAllowed, loadConsentOnce } from './consent';
+import { deniedMedia } from './cookie-consent';
 
-describe('media consent', () => {
-  let browser: EventTarget & { localStorage: Storage };
-  let storage: Map<string, string>;
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+});
 
-  beforeEach(() => {
-    storage = new Map();
-    browser = Object.assign(new EventTarget(), {
+describe('session-only media loading', () => {
+  it('allows one provider for the session without recording a cookie', () => {
+    expect(isProviderAllowed('youtube')).toBe(false);
+    loadConsentOnce('youtube');
+    expect(isProviderAllowed('youtube')).toBe(true);
+    expect(isProviderAllowed('spotify')).toBe(false);
+  });
+});
+
+describe('legacy localStorage migration', () => {
+  it('imports old choices once and removes the legacy keys', async () => {
+    const stored = new Map<string, string>([
+      ['eoak-consent:YouTube', '1'],
+      ['eoak-consent:Bandsintown', '1'],
+    ]);
+    const removeItem = vi.fn((key: string) => stored.delete(key));
+    const fetch = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ media: { ...deniedMedia, youtube: true, bandsintown: true }, updatedAt: 123 }),
+    }));
+
+    vi.stubGlobal('document', { cookie: '', visibilityState: 'visible' });
+    vi.stubGlobal('window', {
       localStorage: {
-        getItem: vi.fn((key: string) => storage.get(key) ?? null),
-        setItem: vi.fn((key: string, value: string) => { storage.set(key, value); }),
-        removeItem: vi.fn((key: string) => { storage.delete(key); }),
-        clear: vi.fn(),
-        key: vi.fn(),
-        length: 0,
+        getItem: (key: string) => stored.get(key) ?? null,
+        removeItem,
       },
     });
-    vi.stubGlobal('window', browser);
-    // Reset the module's session state through the same event a browser sends.
-    const unsubscribe = subscribeConsent(() => {});
-    const event = Object.assign(new Event('storage'), { key: null });
-    browser.dispatchEvent(event);
-    unsubscribe();
-  });
+    vi.stubGlobal('BroadcastChannel', undefined);
+    vi.stubGlobal('fetch', fetch);
 
-  afterEach(() => vi.unstubAllGlobals());
+    await migrateLegacyConsent();
 
-  it('requires explicit consent and supports persistence and revocation', () => {
-    expect(readConsent('YouTube')).toBe(false);
-    writeConsent('YouTube', true);
-    expect(readConsent('YouTube')).toBe(true);
-    expect(storage.get('eoak-consent:YouTube')).toBe('1');
-    expect(readConsent('Spotify')).toBe(false);
-    writeConsent('YouTube', false);
-    expect(readConsent('YouTube')).toBe(false);
-    expect(storage.has('eoak-consent:YouTube')).toBe(false);
-  });
-
-  it('allows loading and revoking when accessing localStorage throws', () => {
-    Object.defineProperty(browser, 'localStorage', {
-      get() { throw new Error('Storage disabled'); },
-    });
-    const callback = vi.fn();
-    const unsubscribe = subscribeConsent(callback);
-    expect(readConsent('YouTube')).toBe(false);
-    writeConsent('YouTube', true);
-    expect(readConsent('YouTube')).toBe(true);
-    writeConsent('YouTube', false);
-    expect(readConsent('YouTube')).toBe(false);
-    expect(callback).toHaveBeenCalledTimes(2);
-    unsubscribe();
-    writeConsent('YouTube', true);
-    expect(callback).toHaveBeenCalledTimes(2);
-  });
-
-  it('uses the in-memory choice when writes fail but reads still work', () => {
-    vi.mocked(browser.localStorage.setItem).mockImplementation(() => { throw new Error('Quota exceeded'); });
-    writeConsent('Spotify', true);
-    expect(storage.size).toBe(0);
-    expect(readConsent('Spotify')).toBe(true);
-    writeConsent('Spotify', false);
-    expect(readConsent('Spotify')).toBe(false);
-  });
-
-  it('responds to another tab revoking consent', () => {
-    writeConsent('Spotify', true);
-    const callback = vi.fn();
-    const unsubscribe = subscribeConsent(callback);
-    storage.delete('eoak-consent:Spotify');
-    browser.dispatchEvent(Object.assign(new Event('storage'), { key: 'eoak-consent:Spotify' }));
-    expect(readConsent('Spotify')).toBe(false);
-    expect(callback).toHaveBeenCalledOnce();
-    unsubscribe();
-  });
-
-  it('never accesses browser storage during server rendering', () => {
-    vi.stubGlobal('window', undefined);
-    expect(readConsent('YouTube')).toBe(false);
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(fetch).toHaveBeenCalledWith('/api/consent', expect.objectContaining({
+      method: 'POST',
+      body: JSON.stringify({ ...deniedMedia, youtube: true, bandsintown: true }),
+    }));
+    expect(removeItem).toHaveBeenCalledTimes(4);
+    expect(stored.size).toBe(0);
   });
 });

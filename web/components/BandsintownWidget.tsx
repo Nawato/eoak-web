@@ -17,12 +17,15 @@ export default function BandsintownWidget({ artistName }: { artistName: string }
   const [failed, setFailed] = useState(false);
   const pendingReady = useRef<(() => void) | null>(null);
 
-  // Drop a still-pending vendor callback on unmount (e.g. after consent is revoked).
+  // Drop a still-pending vendor callback and the injected script on unmount
+  // (e.g. after consent is revoked). Vendor-side cookies are not deleted.
   useEffect(
     () => () => {
       const bit = (window as BandsintownWindow).BIT;
       if (bit && pendingReady.current && bit.onReady === pendingReady.current) delete bit.onReady;
       pendingReady.current = null;
+      document.getElementById('eoak-bandsintown-script')?.remove();
+      delete (window as BandsintownWindow).BIT;
     },
     [],
   );
@@ -53,8 +56,9 @@ export default function BandsintownWidget({ artistName }: { artistName: string }
   return (
     <>
       <Script
+        id="eoak-bandsintown-script"
         src="https://widget.bandsintown.com/main.min.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         onReady={() => {
           // The vendor exposes its initializer after its document-ready callback.
           const bitWindow = window as BandsintownWindow;

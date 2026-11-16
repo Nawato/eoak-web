@@ -4,6 +4,7 @@ import { Inter, Oswald } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CookieBanner from '@/components/CookieBanner';
 import { getSiteSettings, getNavigationContent } from '@/lib/sanity';
 import { getNavLinks } from '@/lib/nav';
 import { resolveFeatures } from '@/lib/features';
@@ -105,6 +106,7 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
+        <CookieBanner />
         <Navbar
           bandName={bandName}
           socialLinks={settings?.socialLinks ?? []}
@@ -122,7 +124,6 @@ export default async function RootLayout({
           pressUrl={features.pressLink ? settings?.pressUrl : null}
           pressLabel={settings?.pressLabel}
           pressDescription={settings?.pressDescription}
-          showPrivacySettings={features.privacySettingsLink}
         />
       </body>
     </html>

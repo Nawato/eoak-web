@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getSiteSettings, getPressKit, getReleases, getMembers, getShows } from '@/lib/sanity';
 import { connection } from 'next/server';
+import { readConsent } from '@/lib/consent-server';
 import Hero from '@/components/Hero';
 import InstagramSection from '@/components/InstagramSection';
 import BackgroundSurface from '@/components/BackgroundSurface';
@@ -53,12 +54,13 @@ export default async function HomePage() {
   await connection();
   const settings = await getSiteSettings();
   const instagramConfigured = hasInstagramConfiguration();
-  const [pressKit, releases, members, shows, instagramFeed] = await Promise.all([
+  const [pressKit, releases, members, shows, instagramFeed, consent] = await Promise.all([
     getPressKit(),
     getReleases(),
     getMembers(),
     getShows(),
     instagramConfigured ? getInstagramFeed() : Promise.resolve({ status: 'unconfigured' as const, posts: [] }),
+    readConsent(),
   ]);
 
   const features = resolveFeatures(settings?.features);
@@ -140,6 +142,7 @@ export default async function HomePage() {
             latestYoutubeUrl={settings?.latestYoutubeUrl ?? ''}
             featuredSpotifyUrl={settings?.featuredSpotifyUrl ?? ''}
             streamingLinks={settings?.streamingLinks}
+            initialMedia={consent?.media ?? null}
           />
         </BackgroundSurface>
       )}
@@ -162,6 +165,7 @@ export default async function HomePage() {
             ticketLabel={settings?.tourTicketLabel}
             soldOutLabel={settings?.tourSoldOutLabel}
             archiveHref={features.tourArchive && shows.length > 0 ? '/tour' : undefined}
+            initialMedia={consent?.media ?? null}
           />
         </BackgroundSurface>
       )}
@@ -191,6 +195,7 @@ export default async function HomePage() {
             heading={settings?.instagramHeading}
             followLabel={settings?.instagramFollowLabel}
             profileUrl={settings?.socialLinks?.find((link) => link.platform === 'instagram')?.url}
+            initialMedia={consent?.media ?? null}
           />
         </BackgroundSurface>
       )}

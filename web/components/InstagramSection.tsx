@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import ConsentEmbed from '@/components/ConsentEmbed';
+import type { ConsentMedia } from '@/lib/cookie-consent';
 import { toHttpsUrl } from '@/lib/embeds';
 import type { InstagramFeed } from '@/lib/instagram';
 
@@ -8,9 +9,16 @@ interface InstagramSectionProps {
   heading?: string | null;
   followLabel?: string | null;
   profileUrl?: string;
+  initialMedia?: ConsentMedia | null;
 }
 
-export default function InstagramSection({ feed, heading, followLabel, profileUrl }: InstagramSectionProps) {
+export default function InstagramSection({
+  feed,
+  heading,
+  followLabel,
+  profileUrl,
+  initialMedia = null,
+}: InstagramSectionProps) {
   if (feed.status === 'unconfigured') return null;
   const profile = toHttpsUrl(profileUrl);
 
@@ -21,7 +29,18 @@ export default function InstagramSection({ feed, heading, followLabel, profileUr
           {heading?.trim() || 'From Instagram'}
         </h2>
         {feed.status === 'ready' && feed.posts.length > 0 ? (
-          <ConsentEmbed provider="Instagram" description="These photos are hosted by Instagram (Meta).">
+          <ConsentEmbed
+            provider="instagram"
+            description="Diese Fotos werden von Instagram (Meta) bereitgestellt."
+            initialAllowed={initialMedia?.instagram === true}
+            placeholderBackdrop={
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+                {Array.from({ length: 6 }, (_, index) => (
+                  <div key={index} className="aspect-square rounded-sm bg-surface" />
+                ))}
+              </div>
+            }
+          >
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {feed.posts.map((post, index) => (
                 <a
@@ -37,6 +56,7 @@ export default function InstagramSection({ feed, heading, followLabel, profileUr
                     alt={post.caption || `Instagram post ${index + 1}`}
                     fill
                     unoptimized
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     className="object-contain"
