@@ -124,12 +124,19 @@ export async function acceptAllConsent(): Promise<void> {
 }
 
 export async function rejectAllConsent(): Promise<void> {
+  // "Nur notwendige" must also stop session-only "Einmal laden" media.
+  onceProviders.clear();
+  notify();
   await persistConsent({ ...deniedMedia });
 }
 
 export async function revokeConsent(provider: ConsentProvider): Promise<void> {
+  const media = { ...getConsentMedia(), [provider]: false };
+  await persistConsent(media);
+  // Only drop the session-only grant once the denial has been persisted, so a
+  // failed request leaves the UI in a state where the error can be surfaced.
   onceProviders.delete(provider);
-  await persistConsent({ ...getConsentMedia(), [provider]: false });
+  notify();
 }
 
 export function loadConsentOnce(provider: ConsentProvider) {

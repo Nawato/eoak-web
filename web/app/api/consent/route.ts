@@ -8,8 +8,6 @@ import {
   serializeConsentCookie,
 } from '@/lib/cookie-consent';
 
-export const dynamic = 'force-dynamic';
-
 function isSameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   // Same-origin fetch requests may omit Origin; a supplied Origin must match.
@@ -17,10 +15,28 @@ function isSameOrigin(request: Request): boolean {
   const host = request.headers.get('host');
   if (!host) return false;
   try {
-    return new URL(origin).host === host;
+    return new URL(origin).host.toLowerCase() === host.toLowerCase();
   } catch {
     return false;
   }
+}
+
+/** Use the externally visible protocol (TLS-terminating proxies set this header). */
+function isSecureRequest(request: Request): boolean {
+  const forwarded = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+  if (forwarded) return forwarded === 'https';
+  return new URL(request.url).protocol === 'https:';
+}
+
+function isLocalhost(request: Request): boolean {
+  // URL.hostname keeps IPv6 brackets, e.g. "[::1]".
+  const hostname = new URL(request.url).hostname.replace(/^\[|\]$/g, '').toLowerCase();
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname.endsWith('.localhost')
+  );
 }
 
 /** Stores the granular media selection in the first-party consent cookie. */
@@ -43,14 +59,14 @@ export async function POST(request: Request): Promise<Response> {
 
   const updatedAt = Date.now();
   const state = createConsentState(media, updatedAt);
-  const hostname = new URL(request.url).hostname;
-  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
   const cookieStore = await cookies();
   // Next.js encodes the cookie value; store the JSON as-is to avoid double encoding.
   cookieStore.set(CONSENT_COOKIE_NAME, serializeConsentCookie(state), {
     path: '/',
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production' && !isLocalhost,
+    // Derive Secure from the actual request scheme so a TLS-terminating proxy
+    // or a plain-HTTP non-local deployment cannot make the cookie unusable.
+    secure: isSecureRequest(request) && !isLocalhost(request),
     httpOnly: false,
     maxAge: CONSENT_COOKIE_MAX_AGE_SECONDS,
   });

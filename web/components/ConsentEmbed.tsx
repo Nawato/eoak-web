@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { consentProviderLabels, type ConsentProvider } from '@/lib/cookie-consent';
 import { loadConsentOnce, openConsentSettings, revokeConsent, useConsentProvider } from '@/lib/consent';
 import { cn } from '@/lib/utils';
@@ -21,10 +21,10 @@ function PlaceholderContent({ provider, description }: { provider: ConsentProvid
   const label = consentProviderLabels[provider];
   return (
     <>
-      <p className="max-w-md text-sm text-zinc-400">
+      <p className="max-w-md text-sm text-muted">
         {description} Beim Laden werden Ihre IP-Adresse und Browserdaten an {label} übertragen; der
         Anbieter kann Cookies oder ähnliche Kennungen setzen. Siehe{' '}
-        <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-rose-300">
+        <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-white">
           Datenschutzerklärung
         </Link>
         .
@@ -60,6 +60,20 @@ export default function ConsentEmbed({
 }: ConsentEmbedProps) {
   const allowed = useConsentProvider(provider, initialAllowed);
   const label = consentProviderLabels[provider];
+  const [revoking, setRevoking] = useState(false);
+  const [revokeFailed, setRevokeFailed] = useState(false);
+
+  async function revoke() {
+    setRevoking(true);
+    setRevokeFailed(false);
+    try {
+      await revokeConsent(provider);
+    } catch {
+      setRevokeFailed(true);
+    } finally {
+      setRevoking(false);
+    }
+  }
 
   if (allowed) {
     return (
@@ -69,13 +83,21 @@ export default function ConsentEmbed({
           type="button"
           lang="de"
           aria-label={`Einwilligung für ${label} widerrufen`}
-          onClick={() => {
-            void revokeConsent(provider).catch(() => {});
-          }}
-          className="absolute right-2 top-2 z-10 inline-flex min-h-11 items-center rounded-sm border border-white/15 bg-black/80 px-3 py-2 text-xs text-zinc-200 shadow-sm transition-colors hover:bg-black hover:text-white"
+          disabled={revoking}
+          onClick={() => void revoke()}
+          className="absolute right-2 top-2 z-10 inline-flex min-h-11 items-center rounded-sm border border-white/15 bg-black/80 px-3 py-2 text-xs text-foreground shadow-sm transition-colors hover:bg-black hover:text-white disabled:opacity-60"
         >
-          Einwilligung widerrufen
+          {revoking ? 'Widerruf läuft …' : 'Einwilligung widerrufen'}
         </button>
+        {revokeFailed && (
+          <p
+            role="alert"
+            lang="de"
+            className="absolute right-2 top-14 z-10 max-w-xs rounded-sm bg-accent-dark px-3 py-2 text-xs text-white shadow-sm"
+          >
+            Widerruf fehlgeschlagen. Bitte versuchen Sie es erneut.
+          </p>
+        )}
       </div>
     );
   }
@@ -85,7 +107,10 @@ export default function ConsentEmbed({
       {placeholderBackdrop ? (
         <div className="relative">
           {placeholderBackdrop}
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-background/85 p-6 text-center" lang="de">
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-start gap-4 bg-background/85 p-6 pt-10 text-center md:justify-center md:pt-6"
+            lang="de"
+          >
             <PlaceholderContent provider={provider} description={description} />
           </div>
         </div>

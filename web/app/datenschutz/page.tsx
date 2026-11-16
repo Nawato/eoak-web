@@ -187,14 +187,13 @@ export default async function DatenschutzPage() {
             </p>
             <h3>6.3 Auswahl ändern, einmalig laden und widerrufen</h3>
             <p>
-              Ihre Auswahl speichern wir im oben genannten Cookie. Sie können sie jederzeit über „Privacy settings“ im
+              Ihre Auswahl speichern wir im oben genannten Cookie. Sie können sie jederzeit über „Datenschutzeinstellungen“ im
               Footer oder über die folgende Schaltfläche ändern. Ein Widerruf wirkt für die Zukunft; bereits bei
               Drittanbietern gespeicherte Daten werden dadurch nicht gelöscht. Über „Einmal laden“ können Sie einzelne
               Inhalte ohne dauerhafte Speicherung Ihrer Auswahl für den aktuellen Seitenbesuch laden; diese Auswahl gilt
-              nur bis zum Neuladen der Seite. Nach einem Widerruf kann bereits geladenes
-              Bandsintown-Widget-JavaScript bis zum nächsten Seitenaufruf aktiv bleiben; ein Neuladen der Seite beendet
-              es. Von Anbietern bereits gesetzte Cookies oder Kennungen werden durch den Widerruf auf unserer Website
-              nicht gelöscht.
+              nur bis zum Neuladen der Seite. Nach einem Widerruf wird ein bereits geladenes
+              Bandsintown-Widget entfernt. Von Anbietern bereits gesetzte Cookies oder Kennungen werden durch den
+              Widerruf auf unserer Website nicht gelöscht.
             </p>
             <PrivacyControls />
           </section>
@@ -234,7 +233,7 @@ export default async function DatenschutzPage() {
               (Art. 16), Löschung (Art. 17), Einschränkung (Art. 18) und Datenübertragbarkeit (Art. 20 DSGVO).
               Einwilligungen können Sie jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO). Wenden
               Sie sich dafür an den oben genannten Datenschutzkontakt. Für Medien-Einwilligungen können Sie Ihre Auswahl
-              außerdem jederzeit über „Privacy settings“ im Footer oder über den Abschnitt 6 dieser Seite ändern.
+              außerdem jederzeit über „Datenschutzeinstellungen“ im Footer oder über den Abschnitt 6 dieser Seite ändern.
             </p>
             <h3>Widerspruchsrecht nach Art. 21 DSGVO</h3>
             <p>

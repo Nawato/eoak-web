@@ -26,7 +26,6 @@ export const defaultFeatures: SiteFeatures = {
   releaseTracklist: true,
   releaseCredits: true,
   releaseShare: true,
-  privacySettingsLink: true,
 };
 
 function isBoolean(value: unknown): value is boolean {

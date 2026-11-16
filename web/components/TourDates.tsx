@@ -81,6 +81,7 @@ export default function TourDates({
               description="Die Konzerttermine werden von Bandsintown bereitgestellt."
               initialAllowed={initialMedia?.bandsintown === true}
               className="mx-auto max-w-xl rounded-sm border border-white/10 bg-zinc-800 p-6"
+              placeholderClassName="min-h-64 md:min-h-[22rem]"
             >
               <BandsintownWidget key={artistName} artistName={artistName} />
             </ConsentEmbed>

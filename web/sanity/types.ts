@@ -48,7 +48,6 @@ export interface SiteFeatures {
   releaseTracklist: boolean;
   releaseCredits: boolean;
   releaseShare: boolean;
-  privacySettingsLink: boolean;
 }
 
 export type TourMode = 'auto' | 'manual' | 'bandsintown';

@@ -499,7 +499,6 @@ export default defineType({
         releaseTracklist: true,
         releaseCredits: true,
         releaseShare: true,
-        privacySettingsLink: true,
       },
       fields: [
         featureField('musicSection', 'Music Section', 'Show the music section (latest video, featured release and streaming links).', true),
@@ -522,7 +521,6 @@ export default defineType({
         featureField('releaseTracklist', 'Release Tracklist', 'Show tracklists on release pages.', true),
         featureField('releaseCredits', 'Release Credits', 'Show production and artwork credits on release pages.', true),
         featureField('releaseShare', 'Release Share Buttons', 'Show Web Share / copy-link buttons on release pages.', true),
-        featureField('privacySettingsLink', 'Privacy Settings Link', 'Show a privacy-settings link in the footer.', true),
       ],
     }),
     defineField({

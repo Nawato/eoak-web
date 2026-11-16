@@ -56,7 +56,6 @@ export default function InstagramSection({
                     alt={post.caption || `Instagram post ${index + 1}`}
                     fill
                     unoptimized
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     className="object-contain"

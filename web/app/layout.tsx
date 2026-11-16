@@ -99,7 +99,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${oswald.variable} font-sans bg-background text-foreground antialiased`}>
+      <body className={`${inter.variable} ${oswald.variable} font-sans bg-background pb-[var(--consent-banner-height,0px)] text-foreground antialiased`}>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-sm focus:bg-accent focus:px-4 focus:py-2 focus:text-white"
