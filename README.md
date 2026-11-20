@@ -199,13 +199,13 @@ Run before pushing:
 ```bash
 cd web
 npm run lint
-npx tsc --noEmit
-npm test
+npm run typecheck
+npm run test
 npm run build
 npm audit --omit=dev
 
 cd ../studio
-npx tsc --noEmit
+npm run typecheck
 npx sanity schema validate
 npm run build
 npm audit --omit=dev

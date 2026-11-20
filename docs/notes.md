@@ -9,6 +9,12 @@ npm run verify
 ```
 
 This runs ESLint, TypeScript, the Vitest suite and a production build for `web/`.
+After Studio schema changes also verify the Studio:
+
+```bash
+npm --prefix studio run typecheck
+npm --prefix studio run build
+```
 
 ## Environment
 
