@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "sanity dev",
     "build": "sanity build",
+    "typecheck": "tsc --noEmit",
     "deploy": "sanity deploy",
     "deploy-schema": "sanity schemas deploy"
   },
