@@ -20,7 +20,6 @@ import { cn } from '@/lib/utils';
 const providerDescriptions: Record<ConsentProvider, string> = {
   youtube: 'Videos von YouTube (Google Ireland Limited).',
   spotify: 'Musikplayer von Spotify (Spotify AB).',
-  instagram: 'Fotos von Instagram (Meta Platforms Ireland Limited).',
   bandsintown: 'Konzerttermine von Bandsintown (Bandsintown, Inc.).',
 };
 

@@ -3,7 +3,7 @@ export const CONSENT_COOKIE_VERSION = 1;
 export const CONSENT_COOKIE_MAX_AGE_SECONDS = 180 * 24 * 60 * 60;
 export const CONSENT_MAX_COOKIE_LENGTH = 400;
 
-export const consentProviders = ['youtube', 'spotify', 'instagram', 'bandsintown'] as const;
+export const consentProviders = ['youtube', 'spotify', 'bandsintown'] as const;
 export type ConsentProvider = (typeof consentProviders)[number];
 
 export type ConsentMedia = Record<ConsentProvider, boolean>;
@@ -17,21 +17,18 @@ export interface ConsentState {
 export const deniedMedia: ConsentMedia = Object.freeze({
   youtube: false,
   spotify: false,
-  instagram: false,
   bandsintown: false,
 });
 
 export const allowedMedia: ConsentMedia = Object.freeze({
   youtube: true,
   spotify: true,
-  instagram: true,
   bandsintown: true,
 });
 
 export const consentProviderLabels: Record<ConsentProvider, string> = {
   youtube: 'YouTube',
   spotify: 'Spotify',
-  instagram: 'Instagram',
   bandsintown: 'Bandsintown',
 };
 
@@ -109,7 +106,6 @@ export function serializeConsentCookie(state: ConsentState): string {
     media: {
       youtube: state.media.youtube,
       spotify: state.media.spotify,
-      instagram: state.media.instagram,
       bandsintown: state.media.bandsintown,
     },
     t: state.updatedAt,

@@ -33,7 +33,6 @@ export interface SiteFeatures {
   tourSection: boolean;
   bioSection: boolean;
   bandSection: boolean;
-  instagramSection: boolean;
   contactSection: boolean;
   newsletterSection: boolean;
   pressLink: boolean;
@@ -77,7 +76,7 @@ export interface BackgroundSettings {
 
 export type BackgroundArea =
   | 'music' | 'releases' | 'shows' | 'bio' | 'band'
-  | 'instagram' | 'contact' | 'impressum' | 'privacy';
+  | 'contact' | 'impressum' | 'privacy';
 
 export interface PortableTextSpan {
   _key?: string;

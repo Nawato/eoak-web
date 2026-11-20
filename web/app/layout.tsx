@@ -8,7 +8,6 @@ import CookieBanner from '@/components/CookieBanner';
 import { getSiteSettings, getNavigationContent } from '@/lib/sanity';
 import { getNavLinks } from '@/lib/nav';
 import { resolveFeatures } from '@/lib/features';
-import { hasInstagramConfiguration } from '@/lib/instagram';
 import { getImageUrl, hasImage } from '@/lib/sanity-image';
 import { siteDescription, siteName, siteUrl } from '@/lib/site';
 
@@ -89,8 +88,6 @@ export default async function RootLayout({
   const links = getNavLinks({
     ...navigation,
     features,
-    hasInstagram: hasInstagramConfiguration(),
-    instagramHeading: settings?.instagramHeading,
     pressUrl: settings?.pressUrl,
     pressLabel: settings?.pressLabel,
     pressDescription: settings?.pressDescription,

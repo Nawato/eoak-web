@@ -5,10 +5,8 @@ import { expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   getSiteSettings: vi.fn(),
   getNavigationContent: vi.fn(),
-  hasInstagramConfiguration: vi.fn(),
 }));
 vi.mock('@/lib/sanity', () => mocks);
-vi.mock('@/lib/instagram', () => ({ hasInstagramConfiguration: mocks.hasInstagramConfiguration }));
 vi.mock('next/font/google', () => ({
   Inter: () => ({ variable: 'font-inter' }),
   Oswald: () => ({ variable: 'font-oswald' }),
@@ -42,15 +40,13 @@ it('publishes crawl, social and theme defaults', async () => {
   expect(viewport).toEqual(expect.objectContaining({ themeColor: '#09090b', colorScheme: 'dark' }));
 });
 
-it('builds navigation without loading full content lists or the Instagram feed', async () => {
+it('builds navigation without loading full content lists', async () => {
   mocks.getSiteSettings.mockResolvedValue(null);
   mocks.getNavigationContent.mockResolvedValue({ hasReleases: true, hasMembers: false });
-  mocks.hasInstagramConfiguration.mockReturnValue(true);
   const children: ReactNode = createElement('p', {}, 'Page content');
   const html = renderToStaticMarkup(await RootLayout({ children }));
   expect(mocks.getNavigationContent).toHaveBeenCalledOnce();
   expect(html).toContain('/#releases');
-  expect(html).toContain('/#instagram');
   expect(html).not.toContain('/#band');
   expect(html).toContain('Page content');
 });

@@ -17,8 +17,6 @@ export interface NavContent {
   hasShows?: boolean;
   hasPhotos?: boolean;
   hasVideos?: boolean;
-  hasInstagram?: boolean;
-  instagramHeading?: string | null;
 }
 
 /** Where the releases index lives: the homepage section first, the archive second. */
@@ -54,8 +52,6 @@ export function getNavLinks({
   hasShows = false,
   hasPhotos = false,
   hasVideos = false,
-  hasInstagram = false,
-  instagramHeading,
   pressUrl,
   pressLabel,
   pressDescription,
@@ -83,13 +79,6 @@ export function getNavLinks({
 
   if (enabled.galleryPage && ((enabled.photoGallery && hasPhotos) || (enabled.videoGallery && hasVideos))) {
     links.push({ href: '/gallery', label: 'Gallery' });
-  }
-
-  if (hasInstagram && enabled.instagramSection) {
-    links.push({
-      href: '/#instagram',
-      label: instagramHeading?.trim() || 'From Instagram',
-    });
   }
 
   if (enabled.contactSection && (enabled.contactForm || enabled.contactChannels)) {

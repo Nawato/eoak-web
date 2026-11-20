@@ -3,26 +3,6 @@ import { getNavLinks, getReleasesBackHref, getReleasesIndexHref } from './nav';
 import { resolveFeatures } from './features';
 
 describe('content-aware navigation', () => {
-  it.each([
-    [' Band updates ', 'Band updates'],
-    ['', 'From Instagram'],
-    ['   ', 'From Instagram'],
-    [null, 'From Instagram'],
-    [undefined, 'From Instagram'],
-  ])('uses the Instagram section heading (%s) as its navigation label', (instagramHeading, label) => {
-    const links = getNavLinks({ hasReleases: false, hasMembers: false, hasInstagram: true, instagramHeading });
-    expect(links.find((link) => link.href === '/#instagram')?.label).toBe(label);
-  });
-  it('shows Instagram only when the feed is configured', () => {
-    expect(
-      getNavLinks({ hasReleases: false, hasMembers: false, hasInstagram: true }).some(
-        (link) => link.href === '/#instagram',
-      ),
-    ).toBe(true);
-    expect(getNavLinks({ hasReleases: false, hasMembers: false }).some((link) => link.href === '/#instagram')).toBe(
-      false,
-    );
-  });
   it('adds tour, gallery and press links only when enabled and configured', () => {
     const links = getNavLinks({
       hasReleases: false,
@@ -52,7 +32,6 @@ describe('content-aware navigation', () => {
       hasShows: false,
       hasPhotos: false,
       hasVideos: false,
-      hasInstagram: false,
       features: {
         musicSection: false,
         releasesSection: false,

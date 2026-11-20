@@ -141,7 +141,7 @@ export default async function DatenschutzPage() {
             <p>
               Wir setzen ein eigenes, technisch notwendiges First-Party-Cookie mit dem Namen
               „eoak-consent-v1“, um Ihre Auswahl zu externen Medien zu speichern. Es enthält ausschließlich die
-              Version, den Zeitpunkt Ihrer Auswahl und vier Ja/Nein-Werte für YouTube, Spotify, Instagram und
+              Version, den Zeitpunkt Ihrer Auswahl und drei Ja/Nein-Werte für YouTube, Spotify und
               Bandsintown – keine IP-Adresse, keine E-Mail-Adresse und keine Browserkennungen. Das Cookie wird mit
               Pfad „/“, „SameSite=Lax“ und in Produktion dem „Secure“-Flag gesetzt, ist nicht „HttpOnly“ (damit die
               Auswahl im Browser unmittelbar umgesetzt werden kann) und läuft nach 180 Tagen ab; danach fragen wir
@@ -150,7 +150,7 @@ export default async function DatenschutzPage() {
             </p>
             <h3>6.2 Externe Medien</h3>
             <p>
-              YouTube, Spotify, Instagram-Fotos und Bandsintown laden wir erst, wenn Sie dem jeweiligen Anbieter im
+              YouTube, Spotify und Bandsintown laden wir erst, wenn Sie dem jeweiligen Anbieter im
               Banner zugestimmt haben. Ohne Einwilligung laden wir keine Inhalte dieser Anbieter; die übrige Website
               können Sie weiter nutzen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO; soweit Informationen auf Ihrem
               Endgerät gespeichert oder ausgelesen werden, gilt § 25 Abs. 1 TDDDG. Beim Laden erhalten Anbieter
@@ -167,13 +167,6 @@ export default async function DatenschutzPage() {
               <li>
                 Spotify (Spotify AB): Wiedergabe der eingebetteten Veröffentlichung.{' '}
                 <a href="https://www.spotify.com/de/legal/privacy-policy/">Datenschutz bei Spotify</a>.
-              </li>
-              <li>
-                Instagram (Meta Platforms Ireland Limited): Anzeige der neuesten sechs Beiträge als Bilder. Die
-                API-Abfrage erfolgt serverseitig mit einem Cache-Intervall von 15 Minuten; dabei wird keine Besucher-IP
-                an die API übermittelt. Nach Einwilligung lädt Ihr Browser Fotos bzw. Video-Vorschaubilder direkt vom
-                Meta-CDN (cdninstagram.com / fbcdn.net). Ein Klick öffnet den Originalbeitrag.{' '}
-                <a href="https://privacycenter.instagram.com/policy/">Datenschutz bei Instagram</a>.
               </li>
               <li>
                 Bandsintown (Bandsintown, Inc.): Anzeige von Konzertterminen durch ein externes Widget und dessen API.{' '}

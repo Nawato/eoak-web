@@ -35,7 +35,7 @@ function request(body: unknown, headers: Record<string, string> = {}) {
 
 describe('consent route', () => {
   it('stores a validated selection in the first-party cookie', async () => {
-    const response = await POST(request({ ...deniedMedia, youtube: true, instagram: true }));
+    const response = await POST(request({ ...deniedMedia, youtube: true }));
     expect(response.status).toBe(200);
 
     const [name, value, options] = mocks.set.mock.calls[0] as [string, string, Record<string, unknown>];
@@ -48,7 +48,7 @@ describe('consent route', () => {
       secure: true,
       maxAge: CONSENT_COOKIE_MAX_AGE_SECONDS,
     }));
-    expect(parseConsentCookie(value)?.media).toEqual({ ...deniedMedia, youtube: true, instagram: true });
+    expect(parseConsentCookie(value)?.media).toEqual({ ...deniedMedia, youtube: true });
   });
 
   it('rejects an invalid selection without setting a cookie', async () => {

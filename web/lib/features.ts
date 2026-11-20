@@ -11,7 +11,6 @@ export const defaultFeatures: SiteFeatures = {
   tourSection: true,
   bioSection: true,
   bandSection: true,
-  instagramSection: true,
   contactSection: true,
   newsletterSection: false,
   pressLink: true,

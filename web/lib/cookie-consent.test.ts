@@ -22,7 +22,7 @@ describe('consent cookie serialization', () => {
     ['all allowed', allowedMedia],
     ['mixed', { ...deniedMedia, youtube: true, bandsintown: true }],
     ['only spotify', { ...deniedMedia, spotify: true }],
-    ['only instagram', { ...deniedMedia, instagram: true }],
+    ['only bandsintown', { ...deniedMedia, bandsintown: true }],
   ])('round-trips %s', (_label, media) => {
     const value = serialized(media);
     expect(value.length).toBeLessThanOrEqual(CONSENT_MAX_COOKIE_LENGTH);
@@ -68,7 +68,7 @@ describe('consent cookie validation', () => {
   });
 
   it('denies prototype-polluting payloads', () => {
-    const payload = `{"v":1,"necessary":true,"media":{"__proto__":{"youtube":true},"youtube":true,"spotify":true,"instagram":true,"bandsintown":true},"t":${now}}`;
+    const payload = `{"v":1,"necessary":true,"media":{"__proto__":{"youtube":true},"youtube":true,"spotify":true,"bandsintown":true},"t":${now}}`;
     expect(parseConsentCookie(payload, now)).toBeNull();
   });
 
@@ -80,6 +80,16 @@ describe('consent cookie validation', () => {
       t: now,
     });
     expect(parseConsentCookie(payload, now)?.media).toEqual({ ...deniedMedia, youtube: true });
+  });
+
+  it('migrates cookies written before the Instagram removal', () => {
+    const payload = JSON.stringify({
+      v: 1,
+      necessary: true,
+      media: { ...deniedMedia, instagram: true },
+      t: now,
+    });
+    expect(parseConsentCookie(payload, now)?.media).toEqual(deniedMedia);
   });
 
   it.each([
@@ -102,7 +112,7 @@ describe('server action input validation', () => {
     ['string', 'youtube'],
     ['missing provider', { youtube: true }],
     ['non-boolean toggle', { ...deniedMedia, youtube: 'yes' }],
-    ['prototype key', JSON.parse('{"__proto__":{},"youtube":false,"spotify":false,"instagram":false,"bandsintown":false}')],
+    ['prototype key', JSON.parse('{"__proto__":{},"youtube":false,"spotify":false,"bandsintown":false}')],
   ])('rejects %s', (_label, value) => {
     expect(normalizeConsentMedia(value)).toBeNull();
   });

@@ -7,10 +7,10 @@ describe('privacy controls', () => {
   it('renders granular provider checkboxes and equally weighted actions', () => {
     const html = renderToStaticMarkup(createElement(PrivacyControls));
 
-    for (const label of ['YouTube', 'Spotify', 'Instagram', 'Bandsintown']) {
+    for (const label of ['YouTube', 'Spotify', 'Bandsintown']) {
       expect(html).toContain(label);
     }
-    expect(html.match(/type="checkbox"/g)).toHaveLength(4);
+    expect(html.match(/type="checkbox"/g)).toHaveLength(3);
     expect(html).toContain('Externe Medien (optional)');
     expect(html).toContain('Alle akzeptieren');
     expect(html).toContain('Nur notwendige');

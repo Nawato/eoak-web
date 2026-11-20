@@ -18,9 +18,11 @@ const LEGACY_STORAGE_PREFIX = 'eoak-consent:';
 const LEGACY_PROVIDERS: Record<string, ConsentProvider> = {
   YouTube: 'youtube',
   Spotify: 'spotify',
-  Instagram: 'instagram',
   Bandsintown: 'bandsintown',
 };
+// Cleanup outlives the provider map: the Instagram feed is gone, but browsers
+// may still hold its legacy key from before the removal.
+const LEGACY_CLEANUP_KEYS = ['YouTube', 'Spotify', 'Instagram', 'Bandsintown'];
 
 const listeners = new Set<() => void>();
 // "Einmal laden" is deliberately session-only: it never reaches the cookie.
@@ -156,7 +158,7 @@ export function closeConsentSettings() {
 
 function removeLegacyStorage() {
   try {
-    for (const legacyProvider of Object.keys(LEGACY_PROVIDERS)) {
+    for (const legacyProvider of LEGACY_CLEANUP_KEYS) {
       window.localStorage.removeItem(LEGACY_STORAGE_PREFIX + legacyProvider);
     }
   } catch {

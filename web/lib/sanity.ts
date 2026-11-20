@@ -51,8 +51,6 @@ function fetchContent<T>(query: string, params: Record<string, string> = {}): Pr
 
 export interface SiteSettings {
   bandName: string;
-  instagramHeading?: string | null;
-  instagramFollowLabel?: string | null;
   socialLinks: SocialLink[];
   latestYoutubeUrl?: string | null;
   featuredSpotifyUrl?: string | null;
@@ -120,7 +118,7 @@ export interface Impressum {
 // Missing fields are returned as null (not omitted), so arrays are coalesced.
 // Explicit projections keep responses small and avoid leaking unused fields to the renderer.
 const SITE_SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0]{
-  bandName, instagramHeading, instagramFollowLabel, "socialLinks": coalesce(socialLinks, []), latestYoutubeUrl, featuredSpotifyUrl,
+  bandName, "socialLinks": coalesce(socialLinks, []), latestYoutubeUrl, featuredSpotifyUrl,
   bandsintownArtistName, bandsintownUrl, contactEmail, "streamingLinks": coalesce(streamingLinks, []), merchUrl, logo, headerLogo,
   heroBackground, heroBackgroundAlt, heroOverlayOpacity, heroEyebrow, heroTagline, ogImage, favicon,
   creditsHeading, "photoCredits": coalesce(photoCredits, []), pageBackgrounds,

@@ -2,7 +2,7 @@
 
 Official website of **End Of All Known**, built with Next.js, React and Tailwind CSS, with content managed in a standalone Sanity Studio.
 
-Features include CMS feature flags, release campaigns and landing pages, a Resend double opt-in newsletter, manual tour dates plus a consent-gated Bandsintown widget, photo and video galleries, an Instagram photo feed, band profiles, an external press/EPK link, contact channels, and German legal pages.
+Features include CMS feature flags, release campaigns and landing pages, a Resend double opt-in newsletter, manual tour dates plus a consent-gated Bandsintown widget, photo and video galleries, band profiles, an external press/EPK link, contact channels, and German legal pages.
 
 ## Local development
 
@@ -46,7 +46,6 @@ Use `web/.env.local` locally and your hosting provider's environment settings in
 | `CONTACT_FROM_EMAIL` | Resend-verified sender; defaults to `kontakt@endofallknown.de` |
 | `RESEND_AUDIENCE_ID` | Resend Audience for native newsletter double opt-in |
 | `NEWSLETTER_SIGNING_SECRET` | Independent newsletter token secret (at least 32 characters); falls back to `SESSION_SECRET` |
-| `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID` | Instagram professional-account token and numeric user ID |
 | `RELEASE_CLICK_HASH_SECRET` | Independent random secret for daily IP deduplication |
 | `RELEASE_CLICK_IP_HEADER` | Client-IP header overwritten by a trusted reverse proxy (click deduplication, contact and newsletter rate limiting) |
 | `RELEASE_CLICK_CLEANUP_SECRET` | Bearer secret for the scheduled analytics cleanup endpoint |
@@ -129,7 +128,7 @@ Without either configuration the section stays hidden. Raw email addresses are n
 
 ### Embeds and contact
 
-YouTube, Spotify, Bandsintown and Instagram media load only after visitor consent. Consent can be revoked on each media block or on `/datenschutz`. When browser storage is blocked, the choice lasts until reload.
+YouTube, Spotify and Bandsintown media load only after visitor consent. Consent can be revoked on each media block or on `/datenschutz`. When browser storage is blocked, the choice lasts until reload.
 
 Contact submissions are routed by the selected topic to an enabled **Contact Channel**, or fall back to **Site Settings → Contact Email**, defaulting to `kontakt@endofallknown.de`. Unknown, disabled or invalid channel keys safely use the fallback. Channels support stable keys, labels, addresses, descriptions and ordering. The visitor's email is used as **Reply-To**, never as the sender. Delivery requires a verified Resend sender domain. The contact section, form and channel cards have separate feature flags; the form includes a privacy consent checkbox linking to `/datenschutz#consent`. Honeypot and per-process rate limiting provide basic spam protection, not distributed enforcement. When `RELEASE_CLICK_IP_HEADER` is not configured (or the header is missing/invalid), submissions still fall back to a conservative shared limit instead of being unlimited.
 
@@ -153,19 +152,6 @@ The cleanup endpoint deletes `clickHash` documents older than 48 hours, giving 4
 Unique means one normalized IP per link per UTC day, not one person. Shared IPs undercount, changing IPs overcounts, and returning visitors count again the next day. Rotating the hash secret resets the current day's deduplication.
 
 Only a daily HMAC is stored, not raw IPs or browser information. These pseudonyms are **not anonymous data** and may be readable through the API on a public dataset. Review legal basis, privacy disclosures, access controls and processor arrangements before enabling tracking. Sanity-backed analytics is intended for this low-volume site, not a high-traffic analytics pipeline.
-
-## Instagram feed
-
-When the Instagram feature is enabled and both credentials are present, the home page fetches the latest six posts server-side and caches responses for 15 minutes. Images and carousel covers are displayed as complete photos; videos use thumbnails linking to the post. Photos load from Meta's CDN only after consent. No scraping or Instagram embed script is used.
-
-Setup requires a **Business or Creator** Instagram account:
-
-1. Create a Meta app with **Instagram API with Instagram Login** and connect the account. Standard Access is sufficient for an account you own/manage; add it to the app.
-2. Grant `instagram_business_basic`, generate a long-lived token, and set `INSTAGRAM_ACCESS_TOKEN`.
-3. Obtain the numeric ID from `/me?fields=user_id,username` and set `INSTAGRAM_USER_ID`, not the profile username.
-4. Restart or redeploy. Refresh or replace the token before its 60-day expiry; this application does not implement OAuth or automatic renewal.
-
-See [Meta's setup guide](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/get-started). Missing credentials hide the section; incomplete/expired credentials or API failures show an unavailable message. Heading and follow-button text are editable; the profile link comes from **Social Links**.
 
 ## Deployment
 
@@ -191,7 +177,7 @@ For updates faster than the 60-second cache, configure a Sanity webhook:
 | Secret | Same value as `SANITY_REVALIDATE_SECRET` |
 | Filter | `_type in ["siteSettings", "pressKit", "impressum", "release", "member", "show", "photo", "video"]` |
 
-The filter excludes analytics mutations so each click does not invalidate content. Navigation uses existence-only queries; Instagram is fetched only by the home page.
+The filter excludes analytics mutations so each click does not invalidate content. Navigation uses existence-only queries.
 
 ### Legal launch checklist
 

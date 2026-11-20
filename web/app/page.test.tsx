@@ -9,10 +9,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/lib/sanity', () => mocks);
-vi.mock('@/lib/instagram', () => ({
-  hasInstagramConfiguration: () => false,
-  getInstagramFeed: vi.fn(),
-}));
 vi.mock('@/lib/sanity-image', () => ({
   hasImage: () => false,
   getImageUrl: vi.fn(),

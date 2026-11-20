@@ -3,7 +3,6 @@ import { getSiteSettings, getPressKit, getReleases, getMembers, getShows } from 
 import { connection } from 'next/server';
 import { readConsent } from '@/lib/consent-server';
 import Hero from '@/components/Hero';
-import InstagramSection from '@/components/InstagramSection';
 import BackgroundSurface from '@/components/BackgroundSurface';
 import MediaSection from '@/components/MediaSection';
 import TourDates from '@/components/TourDates';
@@ -15,7 +14,6 @@ import NewsletterSection from '@/components/NewsletterSection';
 import JsonLd from '@/components/JsonLd';
 import { defaultContactEmail, siteDescription, siteGenre, siteName } from '@/lib/site';
 import { getHttpsLinks, getSpotifyEmbedUrl, getYouTubeVideoId, toHttpsUrl } from '@/lib/embeds';
-import { hasInstagramConfiguration, getInstagramFeed } from '@/lib/instagram';
 import { resolveFeatures } from '@/lib/features';
 import { latestReleaseHref } from '@/lib/releases';
 import { hasNativeNewsletterConfiguration } from '@/lib/newsletter';
@@ -53,13 +51,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   await connection();
   const settings = await getSiteSettings();
-  const instagramConfigured = hasInstagramConfiguration();
-  const [pressKit, releases, members, shows, instagramFeed, consent] = await Promise.all([
+  const [pressKit, releases, members, shows, consent] = await Promise.all([
     getPressKit(),
     getReleases(),
     getMembers(),
     getShows(),
-    instagramConfigured ? getInstagramFeed() : Promise.resolve({ status: 'unconfigured' as const, posts: [] }),
     readConsent(),
   ]);
 
@@ -185,18 +181,6 @@ export default async function HomePage() {
       {features.bandSection && members.length > 0 && (
         <BackgroundSurface background={settings?.pageBackgrounds?.band}>
           <MembersSection members={members} />
-        </BackgroundSurface>
-      )}
-
-      {features.instagramSection && instagramConfigured && instagramFeed.status !== 'unconfigured' && (
-        <BackgroundSurface background={settings?.pageBackgrounds?.instagram}>
-          <InstagramSection
-            feed={instagramFeed}
-            heading={settings?.instagramHeading}
-            followLabel={settings?.instagramFollowLabel}
-            profileUrl={settings?.socialLinks?.find((link) => link.platform === 'instagram')?.url}
-            initialMedia={consent?.media ?? null}
-          />
         </BackgroundSurface>
       )}
 

@@ -78,7 +78,7 @@ export default function CookieBanner() {
                 Datenschutz-Einstellungen
               </h2>
               <p className="mt-2 max-w-3xl text-sm text-muted">
-                Wir laden externe Medien von YouTube, Spotify, Instagram und Bandsintown nur mit Ihrer
+                Wir laden externe Medien von YouTube, Spotify und Bandsintown nur mit Ihrer
                 Einwilligung. Die übrige Website bleibt ohne Einwilligung nutzbar. Details in der{' '}
                 <Link href="/datenschutz" className="text-accent-text underline underline-offset-2 hover:text-white">
                   Datenschutzerklärung

@@ -38,7 +38,7 @@ describe('cookie banner', () => {
     await user.click(trigger);
 
     expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    expect(screen.getAllByRole('checkbox')).toHaveLength(4);
+    expect(screen.getAllByRole('checkbox')).toHaveLength(3);
     expect(document.activeElement).toBe(trigger);
 
     await user.click(screen.getByRole('button', { name: 'Schließen' }));
