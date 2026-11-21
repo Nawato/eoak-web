@@ -14,9 +14,9 @@
     "@portabletext/react": "^8.0.1",
     "@sanity/image-url": "^2.1.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.65.0",
+    "lucide-react": "^1.74.0",
     "next": "^16.4.6",
-    "next-sanity": "^13.4.0",
+    "next-sanity": "^13.5.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "resend": "^6.36.1",
@@ -36,7 +36,7 @@
     "happy-dom": "^21.0.4",
     "postcss": "^8.5.32",
     "tailwindcss": "^4.3.3",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   },
   "overrides": {
